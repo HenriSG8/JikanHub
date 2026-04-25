@@ -93,7 +93,7 @@ fun Route.aiRoutes() {
                     val prompt = buildPrompt(request.title, request.description)
 
                     val geminiResponse = geminiClient.post(
-                        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
+                        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey"
                     ) {
                         contentType(ContentType.Application.Json)
                         setBody(GeminiRequest(
@@ -103,6 +103,11 @@ fun Route.aiRoutes() {
                                 )
                             )
                         ))
+                    }
+
+                    if (!geminiResponse.status.isSuccess()) {
+                        val errorBody = io.ktor.client.statement.bodyAsText(geminiResponse)
+                        throw Exception("Gemini Error ${geminiResponse.status.value}: $errorBody")
                     }
 
                     val body = geminiResponse.body<GeminiResponse>()

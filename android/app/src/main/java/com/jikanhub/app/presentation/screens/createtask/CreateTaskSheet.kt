@@ -40,6 +40,13 @@ fun CreateTaskSheet(
         viewModel.taskCreated.collect { onTaskCreated() }
     }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    LaunchedEffect(uiState.aiError) {
+        if (uiState.aiError != null) {
+            android.widget.Toast.makeText(context, uiState.aiError, android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
