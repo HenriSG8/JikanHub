@@ -92,12 +92,14 @@ class CreateTaskViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isAiLoading = true, aiError = null) }
             try {
+                android.util.Log.d("AI_SUGGEST", "Requesting suggestions for: ${state.title}")
                 val response = api.suggestSubtasks(
                     AiSuggestRequest(
                         title = state.title.trim(),
                         description = state.description.trim()
                     )
                 )
+                android.util.Log.d("AI_SUGGEST", "Got ${response.subtasks.size} suggestions")
                 val newSubtasks = response.subtasks.map { suggestion ->
                     SubtaskDraft(title = suggestion)
                 }
@@ -108,10 +110,11 @@ class CreateTaskViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
+                android.util.Log.e("AI_SUGGEST", "Error: ${e.javaClass.simpleName}: ${e.message}", e)
                 _uiState.update {
                     it.copy(
                         isAiLoading = false,
-                        aiError = "Não foi possível gerar sugestões"
+                        aiError = "Erro: ${e.message ?: "Falha na conexão"}"
                     )
                 }
             }

@@ -92,7 +92,7 @@ fun CreateTaskSheet(
                 )
             )
 
-            // Subtasks section
+            // Subtasks section header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -103,32 +103,37 @@ fun CreateTaskSheet(
                     style = MaterialTheme.typography.labelLarge,
                     color = JikanOnSurfaceVariant
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    // AI Suggest button
-                    TextButton(
-                        onClick = { viewModel.requestAiSuggestions() },
-                        enabled = uiState.title.isNotBlank() && !uiState.isAiLoading
-                    ) {
-                        if (uiState.isAiLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = JikanAccent,
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            Text("Gerando...", style = MaterialTheme.typography.labelSmall)
-                        } else {
-                            Text("✨", style = MaterialTheme.typography.labelLarge)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Sugerir com IA")
-                        }
-                    }
-                    // Manual add
-                    TextButton(onClick = { viewModel.addSubtask() }) {
-                        Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Adicionar")
-                    }
+                TextButton(onClick = { viewModel.addSubtask() }) {
+                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Adicionar")
+                }
+            }
+
+            // AI Suggest button — prominent, full-width
+            OutlinedButton(
+                onClick = { viewModel.requestAiSuggestions() },
+                enabled = uiState.title.isNotBlank() && !uiState.isAiLoading,
+                modifier = Modifier.fillMaxWidth().height(44.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    if (uiState.title.isNotBlank()) JikanAccent.copy(alpha = 0.5f)
+                    else JikanOnSurfaceVariant.copy(alpha = 0.2f)
+                ),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = JikanAccent
+                )
+            ) {
+                if (uiState.isAiLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        color = JikanAccent,
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Gerando sugestões...")
+                } else {
+                    Text("✨  Sugerir com IA", style = MaterialTheme.typography.labelLarge)
                 }
             }
 
@@ -137,11 +142,12 @@ fun CreateTaskSheet(
                 Text(
                     text = uiState.aiError!!,
                     color = JikanPriorityHigh,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
 
+            // Subtask list
             uiState.subtasks.forEach { subtask ->
                 OutlinedTextField(
                     value = subtask.title,
