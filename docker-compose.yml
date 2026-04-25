@@ -13,4 +13,5 @@ services:
       JWT_SECRET: "jikanhub_secret_key_2026_safe"
       JWT_ISSUER: "http://185.225.233.145:8080"
       JWT_AUDIENCE: "jikanhub-users"
+      GEMINI_API_KEY: "AIzaSyCEZwwl100JAem2UFmeRflrdOE--MaVvS8"
     restart: always

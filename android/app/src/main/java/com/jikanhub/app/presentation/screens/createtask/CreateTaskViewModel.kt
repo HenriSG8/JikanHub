@@ -2,6 +2,8 @@ package com.jikanhub.app.presentation.screens.createtask
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jikanhub.app.data.remote.api.JikanHubApi
+import com.jikanhub.app.data.remote.dto.AiSuggestRequest
 import com.jikanhub.app.domain.model.*
 import com.jikanhub.app.domain.usecase.CreateTaskUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateTaskViewModel @Inject constructor(
-    private val createTaskUseCase: CreateTaskUseCase
+    private val createTaskUseCase: CreateTaskUseCase,
+    private val api: JikanHubApi
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CreateTaskUiState())
@@ -81,6 +84,40 @@ class CreateTaskViewModel @Inject constructor(
             )
         }
     }
+
+    fun requestAiSuggestions() {
+        val state = _uiState.value
+        if (state.title.isBlank()) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isAiLoading = true, aiError = null) }
+            try {
+                val response = api.suggestSubtasks(
+                    AiSuggestRequest(
+                        title = state.title.trim(),
+                        description = state.description.trim()
+                    )
+                )
+                val newSubtasks = response.subtasks.map { suggestion ->
+                    SubtaskDraft(title = suggestion)
+                }
+                _uiState.update { current ->
+                    current.copy(
+                        isAiLoading = false,
+                        subtasks = current.subtasks + newSubtasks
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isAiLoading = false,
+                        aiError = "Não foi possível gerar sugestões"
+                    )
+                }
+            }
+        }
+    }
+
 
     fun saveTask() {
         val state = _uiState.value

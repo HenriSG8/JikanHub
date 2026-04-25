@@ -74,3 +74,14 @@ data class SyncResponse(
 
 @Serializable
 data class ErrorResponse(val error: String)
+
+@Serializable
+data class AiSuggestRequest(
+    val title: String,
+    val description: String = ""
+)
+
+@Serializable
+data class AiSuggestResponse(
+    val subtasks: List<String>
+)

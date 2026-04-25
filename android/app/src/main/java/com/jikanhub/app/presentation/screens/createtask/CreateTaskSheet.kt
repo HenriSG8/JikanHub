@@ -103,11 +103,43 @@ fun CreateTaskSheet(
                     style = MaterialTheme.typography.labelLarge,
                     color = JikanOnSurfaceVariant
                 )
-                TextButton(onClick = { viewModel.addSubtask() }) {
-                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Adicionar")
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    // AI Suggest button
+                    TextButton(
+                        onClick = { viewModel.requestAiSuggestions() },
+                        enabled = uiState.title.isNotBlank() && !uiState.isAiLoading
+                    ) {
+                        if (uiState.isAiLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                color = JikanAccent,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Gerando...", style = MaterialTheme.typography.labelSmall)
+                        } else {
+                            Text("✨", style = MaterialTheme.typography.labelLarge)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Sugerir com IA")
+                        }
+                    }
+                    // Manual add
+                    TextButton(onClick = { viewModel.addSubtask() }) {
+                        Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Adicionar")
+                    }
                 }
+            }
+
+            // AI Error message
+            if (uiState.aiError != null) {
+                Text(
+                    text = uiState.aiError!!,
+                    color = JikanPriorityHigh,
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
             }
 
             uiState.subtasks.forEach { subtask ->

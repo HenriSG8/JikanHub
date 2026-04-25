@@ -16,7 +16,9 @@ data class CreateTaskUiState(
     val reminderMessage: String = "",
     val subtasks: List<SubtaskDraft> = emptyList(),
     val isSaving: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isAiLoading: Boolean = false,
+    val aiError: String? = null
 )
 
 data class SubtaskDraft(

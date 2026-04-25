@@ -40,4 +40,8 @@ interface JikanHubApi {
 
     @GET("api/sync")
     suspend fun pullSync(@Query("since") since: String): SyncResponse
+
+    // === AI ===
+    @POST("api/ai/suggest-subtasks")
+    suspend fun suggestSubtasks(@Body request: AiSuggestRequest): AiSuggestResponse
 }

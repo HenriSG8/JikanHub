@@ -77,3 +77,14 @@ data class UserDto(
     val email: String,
     val name: String
 )
+
+@Serializable
+data class AiSuggestRequest(
+    val title: String,
+    val description: String = ""
+)
+
+@Serializable
+data class AiSuggestResponse(
+    val subtasks: List<String>
+)

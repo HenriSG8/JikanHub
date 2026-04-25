@@ -5,6 +5,7 @@ import com.jikanhub.api.config.configureCORS
 import com.jikanhub.api.config.configureDatabase
 import com.jikanhub.api.config.configureSerialization
 import com.jikanhub.api.config.configureStatusPages
+import com.jikanhub.api.routes.aiRoutes
 import com.jikanhub.api.routes.authRoutes
 import com.jikanhub.api.routes.syncRoutes
 import com.jikanhub.api.routes.taskRoutes
@@ -33,5 +34,6 @@ fun Application.module() {
         authRoutes()
         taskRoutes()
         syncRoutes()
+        aiRoutes()
     }
 }
