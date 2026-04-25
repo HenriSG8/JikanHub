@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JikanHub</string>
+
+    <!-- Saudações -->
+    <string name="greeting_morning">Bom dia</string>
+    <string name="greeting_afternoon">Boa tarde</string>
+    <string name="greeting_evening">Boa noite</string>
+
+    <!-- Dashboard -->
+    <string name="empty_tasks">Nenhuma tarefa para este dia</string>
+    <string name="fab_new_task">Nova Tarefa</string>
+
+    <!-- Criar Tarefa -->
+    <string name="field_title">Título</string>
+    <string name="field_description">Descrição</string>
+    <string name="field_date">Data</string>
+    <string name="field_time">Hora</string>
+    <string name="field_priority">Prioridade</string>
+    <string name="field_reminder">Lembrete</string>
+    <string name="field_reminder_message">Mensagem do lembrete</string>
+    <string name="field_reminder_placeholder">Ex: Não esqueça: amanhã tem exame de cálculo às 08:00</string>
+
+    <!-- Prioridade -->
+    <string name="priority_low">Baixa</string>
+    <string name="priority_medium">Média</string>
+    <string name="priority_high">Alta</string>
+
+    <!-- Offsets de lembrete -->
+    <string name="reminder_at_time">No horário</string>
+    <string name="reminder_15min">15 min antes</string>
+    <string name="reminder_1h">1 hora antes</string>
+    <string name="reminder_12h">12 horas antes</string>
+    <string name="reminder_24h">24 horas antes</string>
+
+    <!-- Status -->
+    <string name="status_pending">Pendente</string>
+    <string name="status_completed">Concluída</string>
+    <string name="status_postponed">Adiada</string>
+
+    <!-- Ações -->
+    <string name="btn_save">Salvar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_delete">Excluir</string>
+
+    <!-- Configurações -->
+    <string name="settings_title">Configurações</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_notifications">Notificações</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_sync">Sincronização</string>
+
+    <!-- Autenticação -->
+    <string name="auth_login">Entrar</string>
+    <string name="auth_register">Cadastrar</string>
+    <string name="auth_email">E-mail</string>
+    <string name="auth_password">Senha</string>
+    <string name="auth_name">Nome</string>
+    <string name="auth_google">Entrar com Google</string>
+</resources>

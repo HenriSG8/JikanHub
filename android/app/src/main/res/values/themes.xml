@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.JikanHub" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#FF0F1729</item>
+        <item name="android:statusBarColor">#FF0F1729</item>
+        <item name="android:navigationBarColor">#FF141D33</item>
+    </style>
+
+    <style name="Theme.JikanHub.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FF0F1729</item>
+        <item name="postSplashScreenTheme">@style/Theme.JikanHub</item>
+    </style>
+</resources>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JikanHub</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+
+    <!-- Dashboard -->
+    <string name="empty_tasks">No tasks for this day</string>
+    <string name="fab_new_task">New Task</string>
+
+    <!-- Create Task -->
+    <string name="field_title">Title</string>
+    <string name="field_description">Description</string>
+    <string name="field_date">Date</string>
+    <string name="field_time">Time</string>
+    <string name="field_priority">Priority</string>
+    <string name="field_reminder">Reminder</string>
+    <string name="field_reminder_message">Reminder message</string>
+    <string name="field_reminder_placeholder">e.g., Don\'t forget: you have a calculus exam at 08:00</string>
+
+    <!-- Priority -->
+    <string name="priority_low">Low</string>
+    <string name="priority_medium">Medium</string>
+    <string name="priority_high">High</string>
+
+    <!-- Reminder offsets -->
+    <string name="reminder_at_time">At time</string>
+    <string name="reminder_15min">15 min before</string>
+    <string name="reminder_1h">1 hour before</string>
+    <string name="reminder_12h">12 hours before</string>
+    <string name="reminder_24h">24 hours before</string>
+
+    <!-- Status -->
+    <string name="status_pending">Pending</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_postponed">Postponed</string>
+
+    <!-- Actions -->
+    <string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_delete">Delete</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_sync">Sync</string>
+
+    <!-- Auth -->
+    <string name="auth_login">Sign In</string>
+    <string name="auth_register">Sign Up</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_name">Name</string>
+    <string name="auth_google">Sign in with Google</string>
+</resources>
