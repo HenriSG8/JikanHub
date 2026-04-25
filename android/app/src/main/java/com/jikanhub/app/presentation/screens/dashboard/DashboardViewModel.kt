@@ -20,8 +20,11 @@ class DashboardViewModel @Inject constructor(
     private val getTasksByDate: GetTasksByDateUseCase,
     private val updateTaskStatus: UpdateTaskStatusUseCase,
     private val deleteTask: com.jikanhub.app.domain.usecase.DeleteTaskUseCase,
-    private val alarmScheduler: com.jikanhub.app.notification.AlarmScheduler
+    private val alarmScheduler: com.jikanhub.app.notification.AlarmScheduler,
+    private val tokenManager: com.jikanhub.app.data.local.TokenManager
 ) : ViewModel() {
+
+    private var tasksJob: kotlinx.coroutines.Job? = null
 
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
@@ -66,6 +69,15 @@ class DashboardViewModel @Inject constructor(
     init {
         selectDate(LocalDate.now())
         updateGreeting()
+        loadUserName()
+    }
+
+    private fun loadUserName() {
+        viewModelScope.launch {
+            tokenManager.userName.collect { name ->
+                _uiState.update { it.copy(userName = name ?: "Usuário") }
+            }
+        }
     }
 
     fun selectDate(date: LocalDate) {
@@ -99,7 +111,8 @@ class DashboardViewModel @Inject constructor(
     }
 
     private fun loadTasks(date: LocalDate) {
-        viewModelScope.launch {
+        tasksJob?.cancel()
+        tasksJob = viewModelScope.launch {
             getTasksByDate(date).collect { tasks ->
                 _uiState.update {
                     it.copy(tasks = tasks, isLoading = false)

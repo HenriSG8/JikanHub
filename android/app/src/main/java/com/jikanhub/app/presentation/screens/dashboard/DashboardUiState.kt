@@ -7,6 +7,7 @@ data class DashboardUiState(
     val greeting: String = "",
     val selectedDate: LocalDate = LocalDate.now(),
     val tasks: List<Task> = emptyList(),
+    val userName: String = "Usuário",
     val isLoading: Boolean = false,
     val weekDays: List<DayItem> = emptyList(),
     val showCreateSheet: Boolean = false,

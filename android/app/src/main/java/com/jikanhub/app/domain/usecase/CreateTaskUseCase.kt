@@ -38,13 +38,6 @@ class CreateTaskUseCase @Inject constructor(
     }
 
     private fun generateDefaultMessage(task: Task, offsetMinutes: Int): String {
-        val timeStr = "%02d:%02d".format(task.dateTime.hour, task.dateTime.minute)
-        return when (offsetMinutes) {
-            1440 -> "Amanhã: ${task.title} às $timeStr"
-            720 -> "Não esqueça: ${task.title} às $timeStr"
-            60 -> "Em 1 hora: ${task.title}"
-            15 -> "Em 15 minutos: ${task.title}"
-            else -> "${task.title} — Agora!"
-        }
+        return task.title
     }
 }

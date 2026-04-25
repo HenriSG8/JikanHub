@@ -6,10 +6,15 @@
     <string name="greeting_morning">Bom dia</string>
     <string name="greeting_afternoon">Boa tarde</string>
     <string name="greeting_evening">Boa noite</string>
+    <string name="greeting_user">Olá, %1$s</string>
 
     <!-- Dashboard -->
     <string name="empty_tasks">Nenhuma tarefa para este dia</string>
     <string name="fab_new_task">Nova Tarefa</string>
+    <string name="drawer_tasks_day">Tarefas do Dia</string>
+    <string name="drawer_calendar">Calendário</string>
+    <string name="drawer_settings">Configurações</string>
+    <string name="drawer_logout">Sair</string>
 
     <!-- Criar Tarefa -->
     <string name="field_title">Título</string>
@@ -29,9 +34,12 @@
     <!-- Offsets de lembrete -->
     <string name="reminder_at_time">No horário</string>
     <string name="reminder_15min">15 min antes</string>
+    <string name="reminder_30min">30 min antes</string>
+    <string name="reminder_45min">45 min antes</string>
     <string name="reminder_1h">1 hora antes</string>
     <string name="reminder_12h">12 horas antes</string>
-    <string name="reminder_24h">24 horas antes</string>
+    <string name="reminder_24h">1 dia antes</string>
+    <string name="reminder_48h">2 dias antes</string>
 
     <!-- Status -->
     <string name="status_pending">Pendente</string>

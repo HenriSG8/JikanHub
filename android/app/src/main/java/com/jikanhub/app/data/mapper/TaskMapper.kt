@@ -1,6 +1,7 @@
 package com.jikanhub.app.data.mapper
 
 import com.jikanhub.app.data.local.entity.TaskEntity
+import com.jikanhub.app.data.remote.dto.TaskDto
 import com.jikanhub.app.domain.model.*
 import java.time.Instant
 import java.time.LocalDateTime
@@ -50,6 +51,48 @@ fun Task.toEntity(): TaskEntity {
         isSynced = isSynced
     )
 }
+
+fun TaskEntity.toDto(): TaskDto {
+    return TaskDto(
+        id = id,
+        title = title,
+        description = description,
+        dateTime = java.time.Instant.ofEpochMilli(dateTime)
+            .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().toString(),
+        priority = priority,
+        status = status,
+        reminderEnabled = reminderEnabled,
+        reminderMessage = reminderMessage,
+        reminderOffsets = reminderOffsets.split(",")
+            .filter { it.isNotBlank() }
+            .map { it.toInt() },
+        createdAt = java.time.Instant.ofEpochMilli(createdAt)
+            .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().toString(),
+        updatedAt = java.time.Instant.ofEpochMilli(updatedAt)
+            .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().toString()
+    )
+}
+
+fun TaskDto.toEntity(): TaskEntity {
+    return TaskEntity(
+        id = id,
+        title = title,
+        description = description,
+        dateTime = java.time.LocalDateTime.parse(dateTime)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(),
+        priority = priority,
+        status = status,
+        reminderEnabled = reminderEnabled,
+        reminderMessage = reminderMessage,
+        reminderOffsets = reminderOffsets.joinToString(","),
+        createdAt = java.time.LocalDateTime.parse(createdAt)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(),
+        updatedAt = java.time.LocalDateTime.parse(updatedAt)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(),
+        isSynced = true
+    )
+}
+
 
 private fun parseOffsets(raw: String): List<ReminderOffset> {
     if (raw.isBlank()) return emptyList()

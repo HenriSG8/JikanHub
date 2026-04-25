@@ -8,9 +8,12 @@ package com.jikanhub.app.domain.model
 enum class ReminderOffset(val minutes: Int) {
     AT_TIME(0),
     MINUTES_15(15),
+    MINUTES_30(30),
+    MINUTES_45(45),
     HOUR_1(60),
-    HOURS_12(720),   // Aviso Prévio — 12h before
-    HOURS_24(1440)   // Aviso Prévio — 24h before
+    HOURS_12(720),
+    HOURS_24(1440),
+    HOURS_48(2880)
 }
 
 data class ReminderConfig(

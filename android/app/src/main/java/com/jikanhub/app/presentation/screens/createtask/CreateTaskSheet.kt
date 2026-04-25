@@ -210,9 +210,12 @@ fun CreateTaskSheet(
                             val label = when (offset) {
                                 ReminderOffset.AT_TIME -> stringResource(R.string.reminder_at_time)
                                 ReminderOffset.MINUTES_15 -> stringResource(R.string.reminder_15min)
+                                ReminderOffset.MINUTES_30 -> stringResource(R.string.reminder_30min)
+                                ReminderOffset.MINUTES_45 -> stringResource(R.string.reminder_45min)
                                 ReminderOffset.HOUR_1 -> stringResource(R.string.reminder_1h)
                                 ReminderOffset.HOURS_12 -> stringResource(R.string.reminder_12h)
                                 ReminderOffset.HOURS_24 -> stringResource(R.string.reminder_24h)
+                                ReminderOffset.HOURS_48 -> stringResource(R.string.reminder_48h)
                             }
                             FilterChip(
                                 selected = offset in uiState.selectedOffsets,

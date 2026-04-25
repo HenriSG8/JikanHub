@@ -1,8 +1,10 @@
 package com.jikanhub.app.data.repository
 
+import androidx.work.*
 import com.jikanhub.app.data.local.dao.TaskDao
 import com.jikanhub.app.data.mapper.toDomain
 import com.jikanhub.app.data.mapper.toEntity
+import com.jikanhub.app.data.remote.sync.SyncWorker
 import com.jikanhub.app.domain.model.Task
 import com.jikanhub.app.domain.model.TaskStatus
 import com.jikanhub.app.domain.repository.TaskRepository
@@ -19,7 +21,8 @@ import javax.inject.Inject
  * All writes go to Room first, then sync to server via WorkManager.
  */
 class TaskRepositoryImpl @Inject constructor(
-    private val taskDao: TaskDao
+    private val taskDao: TaskDao,
+    private val workManager: WorkManager
 ) : TaskRepository {
 
     override fun getTasksByDate(date: LocalDate): Flow<List<Task>> {
@@ -47,6 +50,7 @@ class TaskRepositoryImpl @Inject constructor(
             isSynced = false
         )
         taskDao.insertTask(newTask.toEntity())
+        syncWithServer()
         return newTask
     }
 
@@ -56,6 +60,7 @@ class TaskRepositoryImpl @Inject constructor(
             isSynced = false
         )
         taskDao.updateTask(updated.toEntity())
+        syncWithServer()
     }
 
     override suspend fun updateTaskStatus(id: String, status: TaskStatus) {
@@ -64,17 +69,28 @@ class TaskRepositoryImpl @Inject constructor(
             status = status.name,
             updatedAt = System.currentTimeMillis()
         )
+        syncWithServer()
     }
 
     override suspend fun deleteTask(id: String) {
         taskDao.softDeleteTask(id, System.currentTimeMillis())
+        syncWithServer()
     }
 
     override suspend fun syncWithServer() {
-        // TODO: Implement sync logic with JikanHubApi
-        // 1. Get unsynced tasks from Room
-        // 2. Push to server
-        // 3. Pull server changes
-        // 4. Merge and mark as synced
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, java.util.concurrent.TimeUnit.MINUTES)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "jikanhub_sync",
+            ExistingWorkPolicy.REPLACE,
+            syncRequest
+        )
     }
 }

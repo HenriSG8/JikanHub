@@ -19,7 +19,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun login(request: AuthRequest): Result<AuthResponse> {
         return try {
             val response = api.login(request)
-            tokenManager.saveToken(response.token)
+            tokenManager.saveAuthData(response.token, response.user.name)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
@@ -29,7 +29,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun register(request: AuthRequest): Result<AuthResponse> {
         return try {
             val response = api.register(request)
-            tokenManager.saveToken(response.token)
+            tokenManager.saveAuthData(response.token, response.user.name)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
@@ -39,7 +39,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun loginWithGoogle(request: GoogleAuthRequest): Result<AuthResponse> {
         return try {
             val response = api.googleAuth(request)
-            tokenManager.saveToken(response.token)
+            tokenManager.saveAuthData(response.token, response.user.name)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
