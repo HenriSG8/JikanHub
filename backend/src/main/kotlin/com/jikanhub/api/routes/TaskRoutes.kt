@@ -71,10 +71,10 @@ fun Route.taskRoutes() {
                     // Insert subtasks
                     request.subtasks.forEach { sub ->
                         Subtasks.insert { sit ->
-                            sit[id] = sub.id
-                            sit[taskId] = taskId
-                            sit[title] = sub.title
-                            sit[isCompleted] = sub.isCompleted
+                            sit[Subtasks.id] = sub.id
+                            sit[Subtasks.taskId] = taskId
+                            sit[Subtasks.title] = sub.title
+                            sit[Subtasks.isCompleted] = sub.isCompleted
                         }
                     }
                 }
@@ -170,6 +170,4 @@ fun Route.taskRoutes() {
             }
         }
     }
-}
-
 }

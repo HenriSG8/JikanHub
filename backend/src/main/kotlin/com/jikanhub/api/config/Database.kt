@@ -1,5 +1,6 @@
 package com.jikanhub.api.config
 
+import com.jikanhub.api.db.Subtasks
 import com.jikanhub.api.db.Tasks
 import com.jikanhub.api.db.Users
 import com.zaxxer.hikari.HikariConfig
@@ -30,7 +31,7 @@ fun Application.configureDatabase() {
     Database.connect(dataSource)
 
     transaction {
-        SchemaUtils.create(Users, Tasks)
+        SchemaUtils.create(Users, Tasks, Subtasks)
     }
 
     log.info("Database connected and tables created")

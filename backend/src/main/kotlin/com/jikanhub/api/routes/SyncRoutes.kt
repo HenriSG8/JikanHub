@@ -11,6 +11,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 
@@ -50,10 +51,10 @@ fun Route.syncRoutes() {
                                 Subtasks.deleteWhere { Subtasks.taskId eq dto.id }
                                 dto.subtasks.forEach { sub ->
                                     Subtasks.insert { sit ->
-                                        sit[id] = sub.id
-                                        sit[taskId] = dto.id
-                                        sit[title] = sub.title
-                                        sit[isCompleted] = sub.isCompleted
+                                        sit[Subtasks.id] = sub.id
+                                        sit[Subtasks.taskId] = dto.id
+                                        sit[Subtasks.title] = sub.title
+                                        sit[Subtasks.isCompleted] = sub.isCompleted
                                     }
                                 }
                             }
@@ -77,10 +78,10 @@ fun Route.syncRoutes() {
                             // Insert subtasks
                             dto.subtasks.forEach { sub ->
                                 Subtasks.insert { sit ->
-                                    sit[id] = sub.id
-                                    sit[taskId] = dto.id
-                                    sit[title] = sub.title
-                                    sit[isCompleted] = sub.isCompleted
+                                    sit[Subtasks.id] = sub.id
+                                    sit[Subtasks.taskId] = dto.id
+                                    sit[Subtasks.title] = sub.title
+                                    sit[Subtasks.isCompleted] = sub.isCompleted
                                 }
                             }
                         }

@@ -3,6 +3,7 @@ package com.jikanhub.api.db
 import com.jikanhub.api.models.SubtaskDto
 import com.jikanhub.api.models.TaskDto
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
 
 fun ResultRow.toTaskDto(): TaskDto {
