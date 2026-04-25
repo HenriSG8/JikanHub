@@ -94,7 +94,7 @@ fun Route.aiRoutes() {
                     val prompt = buildPrompt(request.title, request.description)
 
                     val geminiResponse = geminiClient.post(
-                        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey"
+                        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
                     ) {
                         contentType(ContentType.Application.Json)
                         setBody(GeminiRequest(

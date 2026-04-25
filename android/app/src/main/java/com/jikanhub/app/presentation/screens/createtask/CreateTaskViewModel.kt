@@ -109,6 +109,19 @@ class CreateTaskViewModel @Inject constructor(
                         subtasks = current.subtasks + newSubtasks
                     )
                 }
+            } catch (e: retrofit2.HttpException) {
+                val errorBodyStr = try {
+                    e.response()?.errorBody()?.string() ?: e.message()
+                } catch (ex: Exception) {
+                    e.message()
+                }
+                android.util.Log.e("AI_SUGGEST", "HttpException: $errorBodyStr", e)
+                _uiState.update {
+                    it.copy(
+                        isAiLoading = false,
+                        aiError = "Erro: $errorBodyStr"
+                    )
+                }
             } catch (e: Exception) {
                 android.util.Log.e("AI_SUGGEST", "Error: ${e.javaClass.simpleName}: ${e.message}", e)
                 _uiState.update {
