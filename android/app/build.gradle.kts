@@ -20,7 +20,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "BASE_URL", "\"http://185.225.233.145:8081\"")
+        buildConfigField("String", "BASE_URL", "\"http://185.225.233.145:8080\"")
     }
 
     buildTypes {
@@ -31,7 +31,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"http://185.225.233.145:8081\"")
+            buildConfigField("String", "BASE_URL", "\"http://185.225.233.145:8080\"")
         }
     }
 
