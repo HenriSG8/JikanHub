@@ -118,7 +118,8 @@ fun Route.aiRoutes() {
                     call.respond(AiSuggestResponse(subtasks = subtasks))
 
                 } catch (e: Exception) {
-                    call.application.log.error("Gemini API error", e)
+                    System.err.println("Gemini API error: ${e.message}")
+                    e.printStackTrace()
                     call.respond(
                         HttpStatusCode.InternalServerError,
                         ErrorResponse("AI suggestion failed: ${e.message}")
