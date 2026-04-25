@@ -10,8 +10,8 @@ services:
       DATABASE_URL: jdbc:postgresql://185.225.233.145:5432/jikanhub_db
       DATABASE_USER: jikan_admin
       DATABASE_PASSWORD: jikanhub
-      JWT_SECRET: "jikanhub_secret_key_2026_safe"
+      JWT_SECRET: "${JWT_SECRET:-jikanhub_secret_key_2026_safe}"
       JWT_ISSUER: "http://185.225.233.145:8080"
       JWT_AUDIENCE: "jikanhub-users"
-      GEMINI_API_KEY: "AIzaSyCLAmczMnc5Zem5lSamXZXPoZG5wibBti4"
+      GEMINI_API_KEY: "${GEMINI_API_KEY}"
     restart: always
