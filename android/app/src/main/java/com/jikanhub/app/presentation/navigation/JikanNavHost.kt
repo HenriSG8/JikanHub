@@ -45,7 +45,13 @@ fun JikanNavHost(
         }
 
         composable("dashboard") {
-            DashboardScreen()
+            DashboardScreen(
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

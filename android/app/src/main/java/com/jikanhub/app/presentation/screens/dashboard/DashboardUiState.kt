@@ -8,10 +8,12 @@ data class DashboardUiState(
     val selectedDate: LocalDate = LocalDate.now(),
     val tasks: List<Task> = emptyList(),
     val userName: String = "Usuário",
+    val currentTab: DashboardTab = DashboardTab.TASKS_OF_DAY,
     val isLoading: Boolean = false,
     val weekDays: List<DayItem> = emptyList(),
     val showCreateSheet: Boolean = false,
-    val selectedTask: Task? = null
+    val selectedTask: Task? = null,
+    val isDarkMode: Boolean = true
 )
 
 data class DayItem(

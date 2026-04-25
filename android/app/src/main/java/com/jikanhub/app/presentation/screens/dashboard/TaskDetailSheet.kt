@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextDecoration
 import com.jikanhub.app.R
 import com.jikanhub.app.domain.model.Task
 import com.jikanhub.app.presentation.theme.*
@@ -17,7 +19,8 @@ import java.time.format.DateTimeFormatter
 fun TaskDetailSheet(
     task: Task,
     onDismiss: () -> Unit,
-    onDelete: (String) -> Unit
+    onDelete: (String) -> Unit,
+    onToggleSubtask: (String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
@@ -25,8 +28,8 @@ fun TaskDetailSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = SurfaceContainer,
-        contentColor = OnSurface
+        containerColor = JikanSurfaceContainer,
+        contentColor = JikanOnSurface
     ) {
         Column(
             modifier = Modifier
@@ -38,9 +41,9 @@ fun TaskDetailSheet(
             // Priority Tag
             Surface(
                 color = when (task.priority.name) {
-                    "HIGH" -> PriorityHigh.copy(alpha = 0.2f)
-                    "MEDIUM" -> PriorityMedium.copy(alpha = 0.2f)
-                    else -> PriorityLow.copy(alpha = 0.2f)
+                    "HIGH" -> JikanPriorityHigh.copy(alpha = 0.2f)
+                    "MEDIUM" -> JikanPriorityMedium.copy(alpha = 0.2f)
+                    else -> JikanPriorityLow.copy(alpha = 0.2f)
                 },
                 shape = MaterialTheme.shapes.small
             ) {
@@ -49,9 +52,9 @@ fun TaskDetailSheet(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall,
                     color = when (task.priority.name) {
-                        "HIGH" -> PriorityHigh
-                        "MEDIUM" -> PriorityMedium
-                        else -> PriorityLow
+                        "HIGH" -> JikanPriorityHigh
+                        "MEDIUM" -> JikanPriorityMedium
+                        else -> JikanPriorityLow
                     }
                 )
             }
@@ -60,7 +63,7 @@ fun TaskDetailSheet(
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.headlineMedium,
-                color = OnSurface,
+                color = JikanOnSurface,
                 fontWeight = FontWeight.Bold
             )
 
@@ -68,17 +71,49 @@ fun TaskDetailSheet(
             Text(
                 text = task.dateTime.format(dateFormatter),
                 style = MaterialTheme.typography.bodyMedium,
-                color = OnSurfaceVariant
+                color = JikanOnSurfaceVariant
             )
 
-            HorizontalDivider(color = OnSurfaceVariant.copy(alpha = 0.1f))
+            HorizontalDivider(color = JikanOnSurfaceVariant.copy(alpha = 0.1f))
 
             // Description
             Text(
                 text = if (task.description.isBlank()) "Sem descrição" else task.description,
                 style = MaterialTheme.typography.bodyLarge,
-                color = OnSurface
+                color = JikanOnSurface
             )
+
+            if (task.subtasks.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Checklist",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JikanOnSurface,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                task.subtasks.forEach { subtask ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = subtask.isCompleted,
+                            onCheckedChange = { onToggleSubtask(subtask.id) },
+                            colors = CheckboxDefaults.colors(checkedColor = JikanAccent)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = subtask.title,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (subtask.isCompleted) JikanOnSurfaceVariant else JikanOnSurface,
+                            textDecoration = if (subtask.isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -89,8 +124,8 @@ fun TaskDetailSheet(
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = PriorityHigh),
-                border = androidx.compose.foundation.BorderStroke(1.dp, PriorityHigh.copy(alpha = 0.3f))
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = JikanPriorityHigh),
+                border = androidx.compose.foundation.BorderStroke(1.dp, JikanPriorityHigh.copy(alpha = 0.3f))
             ) {
                 Text("Excluir Tarefa")
             }

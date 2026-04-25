@@ -14,6 +14,12 @@ data class CreateTaskUiState(
     val reminderEnabled: Boolean = false,
     val selectedOffsets: Set<ReminderOffset> = setOf(ReminderOffset.AT_TIME),
     val reminderMessage: String = "",
+    val subtasks: List<SubtaskDraft> = emptyList(),
     val isSaving: Boolean = false,
     val error: String? = null
+)
+
+data class SubtaskDraft(
+    val id: String = java.util.UUID.randomUUID().toString(),
+    val title: String = ""
 )

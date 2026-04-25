@@ -2,6 +2,8 @@ package com.jikanhub.api.routes
 
 import com.jikanhub.api.config.userId
 import com.jikanhub.api.db.Tasks
+import com.jikanhub.api.db.Subtasks
+import com.jikanhub.api.db.toTaskDto
 import com.jikanhub.api.models.*
 import io.ktor.http.*
 import io.ktor.server.auth.*
@@ -64,6 +66,16 @@ fun Route.taskRoutes() {
                         it[reminderOffsets] = request.reminderOffsets.joinToString(",")
                         it[createdAt] = now
                         it[updatedAt] = now
+                    }
+
+                    // Insert subtasks
+                    request.subtasks.forEach { sub ->
+                        Subtasks.insert { sit ->
+                            sit[id] = sub.id
+                            sit[taskId] = taskId
+                            sit[title] = sub.title
+                            sit[isCompleted] = sub.isCompleted
+                        }
                     }
                 }
 
@@ -160,23 +172,4 @@ fun Route.taskRoutes() {
     }
 }
 
-private fun ResultRow.toTaskDto(): TaskDto {
-    val offsets = this[Tasks.reminderOffsets]
-        .split(",")
-        .filter { it.isNotBlank() }
-        .map { it.trim().toInt() }
-
-    return TaskDto(
-        id = this[Tasks.id],
-        title = this[Tasks.title],
-        description = this[Tasks.description],
-        dateTime = this[Tasks.dateTime].toString(),
-        priority = this[Tasks.priority],
-        status = this[Tasks.status],
-        reminderEnabled = this[Tasks.reminderEnabled],
-        reminderMessage = this[Tasks.reminderMessage],
-        reminderOffsets = offsets,
-        createdAt = this[Tasks.createdAt].toString(),
-        updatedAt = this[Tasks.updatedAt].toString()
-    )
 }

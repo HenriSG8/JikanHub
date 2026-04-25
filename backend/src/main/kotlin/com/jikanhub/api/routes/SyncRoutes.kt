@@ -2,6 +2,8 @@ package com.jikanhub.api.routes
 
 import com.jikanhub.api.config.userId
 import com.jikanhub.api.db.Tasks
+import com.jikanhub.api.db.Subtasks
+import com.jikanhub.api.db.toTaskDto
 import com.jikanhub.api.models.*
 import io.ktor.http.*
 import io.ktor.server.auth.*
@@ -43,12 +45,23 @@ fun Route.syncRoutes() {
                                     it[reminderOffsets] = dto.reminderOffsets.joinToString(",")
                                     it[updatedAt] = clientUpdated
                                 }
+
+                                // Update subtasks
+                                Subtasks.deleteWhere { Subtasks.taskId eq dto.id }
+                                dto.subtasks.forEach { sub ->
+                                    Subtasks.insert { sit ->
+                                        sit[id] = sub.id
+                                        sit[taskId] = dto.id
+                                        sit[title] = sub.title
+                                        sit[isCompleted] = sub.isCompleted
+                                    }
+                                }
                             }
                         } else {
                             // Insert new
                             Tasks.insert {
                                 it[id] = dto.id
-                                it[Tasks.userId] = userId
+                                it[this.userId] = userId
                                 it[title] = dto.title
                                 it[description] = dto.description
                                 it[dateTime] = LocalDateTime.parse(dto.dateTime)
@@ -57,8 +70,18 @@ fun Route.syncRoutes() {
                                 it[reminderEnabled] = dto.reminderEnabled
                                 it[reminderMessage] = dto.reminderMessage
                                 it[reminderOffsets] = dto.reminderOffsets.joinToString(",")
-                                it[createdAt] = LocalDateTime.parse(dto.createdAt)
+                                it[createdAt] = LocalDateTime.now()
                                 it[updatedAt] = LocalDateTime.parse(dto.updatedAt)
+                            }
+
+                            // Insert subtasks
+                            dto.subtasks.forEach { sub ->
+                                Subtasks.insert { sit ->
+                                    sit[id] = sub.id
+                                    sit[taskId] = dto.id
+                                    sit[title] = sub.title
+                                    sit[isCompleted] = sub.isCompleted
+                                }
                             }
                         }
                     }
@@ -68,26 +91,7 @@ fun Route.syncRoutes() {
                 val serverTasks = transaction {
                     Tasks.selectAll().where {
                         (Tasks.userId eq userId) and (Tasks.isDeleted eq false)
-                    }.map { row ->
-                        val offsets = row[Tasks.reminderOffsets]
-                            .split(",")
-                            .filter { it.isNotBlank() }
-                            .map { it.trim().toInt() }
-
-                        TaskDto(
-                            id = row[Tasks.id],
-                            title = row[Tasks.title],
-                            description = row[Tasks.description],
-                            dateTime = row[Tasks.dateTime].toString(),
-                            priority = row[Tasks.priority],
-                            status = row[Tasks.status],
-                            reminderEnabled = row[Tasks.reminderEnabled],
-                            reminderMessage = row[Tasks.reminderMessage],
-                            reminderOffsets = offsets,
-                            createdAt = row[Tasks.createdAt].toString(),
-                            updatedAt = row[Tasks.updatedAt].toString()
-                        )
-                    }
+                    }.map { it.toTaskDto() }
                 }
 
                 call.respond(SyncResponse(
@@ -108,26 +112,7 @@ fun Route.syncRoutes() {
                         (Tasks.userId eq userId) and
                         (Tasks.updatedAt greaterEq since) and
                         (Tasks.isDeleted eq false)
-                    }.map { row ->
-                        val offsets = row[Tasks.reminderOffsets]
-                            .split(",")
-                            .filter { it.isNotBlank() }
-                            .map { it.trim().toInt() }
-
-                        TaskDto(
-                            id = row[Tasks.id],
-                            title = row[Tasks.title],
-                            description = row[Tasks.description],
-                            dateTime = row[Tasks.dateTime].toString(),
-                            priority = row[Tasks.priority],
-                            status = row[Tasks.status],
-                            reminderEnabled = row[Tasks.reminderEnabled],
-                            reminderMessage = row[Tasks.reminderMessage],
-                            reminderOffsets = offsets,
-                            createdAt = row[Tasks.createdAt].toString(),
-                            updatedAt = row[Tasks.updatedAt].toString()
-                        )
-                    }
+                    }.map { it.toTaskDto() }
                 }
 
                 call.respond(SyncResponse(

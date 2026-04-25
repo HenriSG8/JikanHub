@@ -28,7 +28,9 @@ object DatabaseModule {
             context,
             JikanHubDatabase::class.java,
             "jikanhub_db"
-        ).build()
+        )
+        .fallbackToDestructiveMigration()
+        .build()
     }
 
     @Provides

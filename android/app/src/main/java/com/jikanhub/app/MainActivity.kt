@@ -19,6 +19,8 @@ import com.jikanhub.app.presentation.navigation.JikanNavHost
 import com.jikanhub.app.presentation.theme.JikanHubTheme
 import com.jikanhub.app.domain.repository.AuthRepository
 import dagger.hilt.android.AndroidEntryPoint
+import com.jikanhub.app.data.local.TokenManager
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,6 +30,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var authRepository: AuthRepository
 
+    @Inject
+    lateinit var tokenManager: TokenManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -35,15 +40,23 @@ class MainActivity : ComponentActivity() {
         requestNotificationPermission()
 
         var startDestination by mutableStateOf<String?>(null)
+        var isDarkMode by mutableStateOf(true)
 
         lifecycleScope.launch {
-            startDestination = if (authRepository.isLoggedIn()) "dashboard" else "login"
+            launch {
+                startDestination = if (authRepository.isLoggedIn()) "dashboard" else "login"
+            }
+            launch {
+                tokenManager.isDarkMode.collectLatest { dark ->
+                    isDarkMode = dark
+                }
+            }
         }
 
         splashScreen.setKeepOnScreenCondition { startDestination == null }
 
         setContent {
-            JikanHubTheme {
+            JikanHubTheme(darkTheme = isDarkMode) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     startDestination?.let { destination ->
                         JikanNavHost(startDestination = destination)

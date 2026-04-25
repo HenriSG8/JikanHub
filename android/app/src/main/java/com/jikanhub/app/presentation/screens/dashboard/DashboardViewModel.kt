@@ -20,6 +20,7 @@ class DashboardViewModel @Inject constructor(
     private val getTasksByDate: GetTasksByDateUseCase,
     private val updateTaskStatus: UpdateTaskStatusUseCase,
     private val deleteTask: com.jikanhub.app.domain.usecase.DeleteTaskUseCase,
+    private val updateTask: com.jikanhub.app.domain.usecase.UpdateTaskUseCase,
     private val alarmScheduler: com.jikanhub.app.notification.AlarmScheduler,
     private val tokenManager: com.jikanhub.app.data.local.TokenManager
 ) : ViewModel() {
@@ -70,12 +71,41 @@ class DashboardViewModel @Inject constructor(
         selectDate(LocalDate.now())
         updateGreeting()
         loadUserName()
+        loadThemePreference()
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            tokenManager.clearAuthData()
+        }
+    }
+
+    fun toggleTheme() {
+        viewModelScope.launch {
+            val newTheme = !_uiState.value.isDarkMode
+            tokenManager.setDarkMode(newTheme)
+        }
+    }
+
+    fun changeTab(tab: DashboardTab) {
+        _uiState.update { it.copy(currentTab = tab) }
+        if (tab == DashboardTab.TASKS_OF_DAY) {
+            selectDate(LocalDate.now())
+        }
     }
 
     private fun loadUserName() {
         viewModelScope.launch {
             tokenManager.userName.collect { name ->
                 _uiState.update { it.copy(userName = name ?: "Usuário") }
+            }
+        }
+    }
+
+    private fun loadThemePreference() {
+        viewModelScope.launch {
+            tokenManager.isDarkMode.collect { isDark ->
+                _uiState.update { it.copy(isDarkMode = isDark) }
             }
         }
     }
@@ -94,6 +124,19 @@ class DashboardViewModel @Inject constructor(
                 TaskStatus.COMPLETED
             }
             updateTaskStatus(taskId, newStatus)
+        }
+    }
+
+    fun toggleSubtask(task: com.jikanhub.app.domain.model.Task, subtaskId: String) {
+        viewModelScope.launch {
+            val updatedSubtasks = task.subtasks.map { 
+                if (it.id == subtaskId) it.copy(isCompleted = !it.isCompleted) else it 
+            }
+            val updatedTask = task.copy(subtasks = updatedSubtasks)
+            updateTask(updatedTask)
+            
+            // Also update the selected task in state to reflect change immediately in UI
+            _uiState.update { it.copy(selectedTask = updatedTask) }
         }
     }
 

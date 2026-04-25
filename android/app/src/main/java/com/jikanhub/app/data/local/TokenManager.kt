@@ -20,6 +20,7 @@ class TokenManager @Inject constructor(
 ) {
     private val TOKEN_KEY = stringPreferencesKey("jwt_token")
     private val NAME_KEY = stringPreferencesKey("user_name")
+    private val DARK_MODE_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("dark_mode")
 
     val token: Flow<String?> = context.dataStore.data
         .map { preferences ->
@@ -31,6 +32,17 @@ class TokenManager @Inject constructor(
             preferences[NAME_KEY] ?: "Usuário"
         }
 
+    val isDarkMode: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[DARK_MODE_KEY] ?: true // Default is dark theme
+        }
+
+    suspend fun setDarkMode(isDark: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[DARK_MODE_KEY] = isDark
+        }
+    }
+
     suspend fun saveAuthData(token: String, name: String) {
         context.dataStore.edit { preferences ->
             preferences[TOKEN_KEY] = token
@@ -38,9 +50,10 @@ class TokenManager @Inject constructor(
         }
     }
 
-    suspend fun clearToken() {
+    suspend fun clearAuthData() {
         context.dataStore.edit { preferences ->
             preferences.remove(TOKEN_KEY)
+            preferences.remove(NAME_KEY)
         }
     }
 }

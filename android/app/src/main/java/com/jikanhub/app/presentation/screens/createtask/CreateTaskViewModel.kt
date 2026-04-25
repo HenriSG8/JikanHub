@@ -60,6 +60,28 @@ class CreateTaskViewModel @Inject constructor(
         _uiState.update { it.copy(reminderMessage = message) }
     }
 
+    fun addSubtask() {
+        _uiState.update { state ->
+            state.copy(subtasks = state.subtasks + SubtaskDraft())
+        }
+    }
+
+    fun removeSubtask(id: String) {
+        _uiState.update { state ->
+            state.copy(subtasks = state.subtasks.filter { it.id != id })
+        }
+    }
+
+    fun updateSubtaskTitle(id: String, title: String) {
+        _uiState.update { state ->
+            state.copy(
+                subtasks = state.subtasks.map { 
+                    if (it.id == id) it.copy(title = title) else it 
+                }
+            )
+        }
+    }
+
     fun saveTask() {
         val state = _uiState.value
 
@@ -82,7 +104,10 @@ class CreateTaskViewModel @Inject constructor(
                         offsets = if (state.reminderEnabled) {
                             state.selectedOffsets.toList()
                         } else emptyList()
-                    )
+                    ),
+                    subtasks = state.subtasks
+                        .filter { it.title.isNotBlank() }
+                        .map { Subtask(id = it.id, title = it.title.trim(), isCompleted = false) }
                 )
                 createTaskUseCase(task)
                 _uiState.value = CreateTaskUiState() // Reseta o estado (limpa os campos)

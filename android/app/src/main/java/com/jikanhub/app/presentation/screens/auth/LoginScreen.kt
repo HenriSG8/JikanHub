@@ -41,7 +41,7 @@ fun LoginScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Surface, SurfaceContainer)
+                    colors = listOf(JikanSurface, JikanSurfaceContainer)
                 )
             )
             .padding(24.dp)
@@ -55,14 +55,14 @@ fun LoginScreen(
             Text(
                 text = "JikanHub",
                 style = MaterialTheme.typography.headlineLarge,
-                color = Accent,
+                color = JikanAccent,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 4.sp
             )
             Text(
                 text = "時間 — O seu tempo, organizado.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = OnSurfaceVariant,
+                color = JikanOnSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
@@ -77,9 +77,9 @@ fun LoginScreen(
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = Accent
+                    focusedBorderColor = JikanAccent,
+                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                    cursorColor = JikanAccent
                 )
             )
 
@@ -94,16 +94,16 @@ fun LoginScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = Accent
+                    focusedBorderColor = JikanAccent,
+                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                    cursorColor = JikanAccent
                 )
             )
 
             if (uiState.error != null) {
                 Text(
                     text = uiState.error!!,
-                    color = PriorityHigh,
+                    color = JikanPriorityHigh,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -118,13 +118,13 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                colors = ButtonDefaults.buttonColors(containerColor = JikanAccent),
                 enabled = !uiState.isLoading
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(color = Surface, modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(color = JikanSurface, modifier = Modifier.size(24.dp))
                 } else {
-                    Text("ENTRAR", fontWeight = FontWeight.Bold, color = Surface)
+                    Text("ENTRAR", fontWeight = FontWeight.Bold, color = JikanSurface)
                 }
             }
 
@@ -137,9 +137,9 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, OnSurfaceVariant.copy(alpha = 0.3f))
+                border = androidx.compose.foundation.BorderStroke(1.dp, JikanOnSurfaceVariant.copy(alpha = 0.3f))
             ) {
-                Text("Entrar com Google", color = OnSurface)
+                Text("Entrar com Google", color = JikanOnSurface)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -147,7 +147,7 @@ fun LoginScreen(
             TextButton(onClick = onNavigateToRegister) {
                 Text(
                     text = "Ainda não tem conta? Crie uma agora",
-                    color = OnSurfaceVariant,
+                    color = JikanOnSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

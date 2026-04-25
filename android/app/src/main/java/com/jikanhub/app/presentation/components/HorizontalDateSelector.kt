@@ -49,11 +49,11 @@ private fun DateItem(
     onClick: () -> Unit
 ) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (day.isSelected) Accent else SurfaceVariant,
+        targetValue = if (day.isSelected) JikanAccent else JikanSurfaceVariant,
         label = "dateItemBg"
     )
     val textColor by animateColorAsState(
-        targetValue = if (day.isSelected) OnSurface else OnSurfaceVariant,
+        targetValue = if (day.isSelected) JikanOnSurface else JikanOnSurfaceVariant,
         label = "dateItemText"
     )
     val isToday = day.date == LocalDate.now()
@@ -84,7 +84,7 @@ private fun DateItem(
                 modifier = Modifier
                     .size(5.dp)
                     .clip(CircleShape)
-                    .background(if (day.isSelected) OnSurface else Accent)
+                    .background(if (day.isSelected) JikanOnSurface else JikanAccent)
             )
         } else {
             Spacer(modifier = Modifier.height(5.dp))

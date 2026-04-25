@@ -13,6 +13,7 @@ data class TaskDto(
     val reminderEnabled: Boolean = false,
     val reminderMessage: String = "",
     val reminderOffsets: List<Int> = emptyList(),
+    val subtasks: List<SubtaskDto> = emptyList(),
     val createdAt: String,
     val updatedAt: String
 )
@@ -25,7 +26,15 @@ data class CreateTaskRequest(
     val priority: String,
     val reminderEnabled: Boolean = false,
     val reminderMessage: String = "",
-    val reminderOffsets: List<Int> = emptyList()
+    val reminderOffsets: List<Int> = emptyList(),
+    val subtasks: List<SubtaskDto> = emptyList()
+)
+
+@Serializable
+data class SubtaskDto(
+    val id: String,
+    val title: String,
+    val isCompleted: Boolean
 )
 
 @Serializable

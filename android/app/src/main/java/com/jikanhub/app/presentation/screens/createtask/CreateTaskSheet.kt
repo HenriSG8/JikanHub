@@ -17,6 +17,9 @@ import com.jikanhub.app.R
 import com.jikanhub.app.domain.model.Priority
 import com.jikanhub.app.domain.model.ReminderOffset
 import com.jikanhub.app.presentation.theme.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.RemoveCircle
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -40,9 +43,9 @@ fun CreateTaskSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = SurfaceContainer,
-        contentColor = OnSurface,
-        dragHandle = { BottomSheetDefaults.DragHandle(color = OnSurfaceVariant) }
+        containerColor = JikanSurfaceContainer,
+        contentColor = JikanOnSurface,
+        dragHandle = { BottomSheetDefaults.DragHandle(color = JikanOnSurfaceVariant) }
     ) {
         Column(
             modifier = Modifier
@@ -56,7 +59,7 @@ fun CreateTaskSheet(
             Text(
                 text = stringResource(R.string.fab_new_task),
                 style = MaterialTheme.typography.headlineMedium,
-                color = OnSurface
+                color = JikanOnSurface
             )
 
             // Task title field
@@ -68,9 +71,9 @@ fun CreateTaskSheet(
                 isError = uiState.error == "title_required",
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = Accent
+                    focusedBorderColor = JikanAccent,
+                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                    cursorColor = JikanAccent
                 )
             )
 
@@ -83,11 +86,53 @@ fun CreateTaskSheet(
                 minLines = 2,
                 maxLines = 4,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = Accent
+                    focusedBorderColor = JikanAccent,
+                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                    cursorColor = JikanAccent
                 )
             )
+
+            // Subtasks section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Subtarefas",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = JikanOnSurfaceVariant
+                )
+                TextButton(onClick = { viewModel.addSubtask() }) {
+                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Adicionar")
+                }
+            }
+
+            uiState.subtasks.forEach { subtask ->
+                OutlinedTextField(
+                    value = subtask.title,
+                    onValueChange = { viewModel.updateSubtaskTitle(subtask.id, it) },
+                    placeholder = { Text("Ex: Comprar leite") },
+                    modifier = Modifier.fillMaxWidth(),
+                    trailingIcon = {
+                        IconButton(onClick = { viewModel.removeSubtask(subtask.id) }) {
+                            Icon(
+                                imageVector = Icons.Outlined.RemoveCircle,
+                                contentDescription = "Remover subtarefa",
+                                tint = JikanPriorityHigh
+                            )
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = JikanAccent,
+                        unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.2f),
+                        cursorColor = JikanAccent
+                    ),
+                    singleLine = true
+                )
+            }
 
             // Date & Time row
             val context = androidx.compose.ui.platform.LocalContext.current
@@ -116,9 +161,9 @@ fun CreateTaskSheet(
                         },
                     enabled = false, // Use enabled=false + clickable modifier for text fields to act as buttons
                     colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                        disabledTextColor = OnSurface,
-                        disabledLabelColor = OnSurfaceVariant
+                        disabledBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                        disabledTextColor = JikanOnSurface,
+                        disabledLabelColor = JikanOnSurfaceVariant
                     )
                 )
                 OutlinedTextField(
@@ -141,9 +186,9 @@ fun CreateTaskSheet(
                         },
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                        disabledTextColor = OnSurface,
-                        disabledLabelColor = OnSurfaceVariant
+                        disabledBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                        disabledTextColor = JikanOnSurface,
+                        disabledLabelColor = JikanOnSurfaceVariant
                     )
                 )
             }
@@ -152,7 +197,7 @@ fun CreateTaskSheet(
             Text(
                 text = stringResource(R.string.field_priority),
                 style = MaterialTheme.typography.labelLarge,
-                color = OnSurfaceVariant
+                color = JikanOnSurfaceVariant
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -160,21 +205,21 @@ fun CreateTaskSheet(
             ) {
                 PriorityChip(
                     label = stringResource(R.string.priority_low),
-                    color = PriorityLow,
+                    color = JikanPriorityLow,
                     selected = uiState.priority == Priority.LOW,
                     onClick = { viewModel.updatePriority(Priority.LOW) },
                     modifier = Modifier.weight(1f)
                 )
                 PriorityChip(
                     label = stringResource(R.string.priority_medium),
-                    color = PriorityMedium,
+                    color = JikanPriorityMedium,
                     selected = uiState.priority == Priority.MEDIUM,
                     onClick = { viewModel.updatePriority(Priority.MEDIUM) },
                     modifier = Modifier.weight(1f)
                 )
                 PriorityChip(
                     label = stringResource(R.string.priority_high),
-                    color = PriorityHigh,
+                    color = JikanPriorityHigh,
                     selected = uiState.priority == Priority.HIGH,
                     onClick = { viewModel.updatePriority(Priority.HIGH) },
                     modifier = Modifier.weight(1f)
@@ -189,12 +234,12 @@ fun CreateTaskSheet(
                 Text(
                     text = stringResource(R.string.field_reminder),
                     style = MaterialTheme.typography.labelLarge,
-                    color = OnSurfaceVariant
+                    color = JikanOnSurfaceVariant
                 )
                 Switch(
                     checked = uiState.reminderEnabled,
                     onCheckedChange = { viewModel.toggleReminder(it) },
-                    colors = SwitchDefaults.colors(checkedTrackColor = Accent)
+                    colors = SwitchDefaults.colors(checkedTrackColor = JikanAccent)
                 )
             }
 
@@ -222,8 +267,8 @@ fun CreateTaskSheet(
                                 onClick = { viewModel.toggleOffset(offset) },
                                 label = { Text(label) },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Accent.copy(alpha = 0.2f),
-                                    selectedLabelColor = Accent
+                                    selectedContainerColor = JikanAccent.copy(alpha = 0.2f),
+                                    selectedLabelColor = JikanAccent
                                 )
                             )
                         }
@@ -238,9 +283,9 @@ fun CreateTaskSheet(
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 2,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Accent,
-                            unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                            cursorColor = Accent
+                            focusedBorderColor = JikanAccent,
+                            unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                            cursorColor = JikanAccent
                         )
                     )
                 }
@@ -255,14 +300,14 @@ fun CreateTaskSheet(
                     .fillMaxWidth()
                     .height(52.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Accent,
-                    contentColor = OnSurface
+                    containerColor = JikanAccent,
+                    contentColor = JikanOnSurface
                 ),
                 enabled = !uiState.isSaving
             ) {
                 if (uiState.isSaving) {
                     CircularProgressIndicator(
-                        color = OnSurface,
+                        color = JikanOnSurface,
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp
                     )
@@ -293,7 +338,7 @@ private fun PriorityChip(
         colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = color.copy(alpha = 0.2f),
             selectedLabelColor = color,
-            labelColor = OnSurfaceVariant
+            labelColor = JikanOnSurfaceVariant
         ),
         border = FilterChipDefaults.filterChipBorder(
             borderColor = color.copy(alpha = 0.3f),

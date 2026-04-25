@@ -47,7 +47,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
-        tokenManager.clearToken()
+        tokenManager.clearAuthData()
     }
 
     override suspend fun isLoggedIn(): Boolean {

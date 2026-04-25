@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.NotificationsOff
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,9 +35,9 @@ fun TaskCard(
     val cardAlpha = if (isCompleted) 0.6f else 1f
 
     val priorityColor = when (task.priority) {
-        Priority.HIGH -> PriorityHigh
-        Priority.MEDIUM -> PriorityMedium
-        Priority.LOW -> PriorityLow
+        Priority.HIGH -> JikanPriorityHigh
+        Priority.MEDIUM -> JikanPriorityMedium
+        Priority.LOW -> JikanPriorityLow
     }
 
     Card(
@@ -45,7 +46,7 @@ fun TaskCard(
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = SurfaceVariant.copy(alpha = cardAlpha)
+            containerColor = JikanSurfaceVariant.copy(alpha = cardAlpha)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -61,8 +62,8 @@ fun TaskCard(
                 onCheckedChange = { onToggleComplete() },
                 colors = CheckboxDefaults.colors(
                     checkedColor = Completed,
-                    uncheckedColor = OnSurfaceVariant,
-                    checkmarkColor = Surface
+                    uncheckedColor = JikanOnSurfaceVariant,
+                    checkmarkColor = JikanSurface
                 )
             )
 
@@ -73,7 +74,7 @@ fun TaskCard(
                 Text(
                     text = task.title,
                     style = MaterialTheme.typography.titleMedium,
-                    color = OnSurface.copy(alpha = cardAlpha),
+                    color = JikanOnSurface.copy(alpha = cardAlpha),
                     textDecoration = if (isCompleted) TextDecoration.LineThrough else null,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -84,10 +85,30 @@ fun TaskCard(
                     Text(
                         text = task.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceVariant.copy(alpha = cardAlpha),
+                        color = JikanOnSurfaceVariant.copy(alpha = cardAlpha),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+                }
+
+                // Subtasks progress
+                if (task.subtasks.isNotEmpty()) {
+                    val completed = task.subtasks.count { it.isCompleted }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Outlined.List,
+                            contentDescription = null,
+                            tint = if (completed == task.subtasks.size) Completed else JikanOnSurfaceVariant,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "$completed/${task.subtasks.size}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (completed == task.subtasks.size) Completed else JikanOnSurfaceVariant
+                        )
+                    }
                 }
             }
 
@@ -101,7 +122,7 @@ fun TaskCard(
                 // Time badge
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = SurfaceBright,
+                    color = JikanSurfaceBright,
                     tonalElevation = 0.dp
                 ) {
                     Text(
@@ -110,7 +131,7 @@ fun TaskCard(
                             task.dateTime.minute
                         ),
                         style = MaterialTheme.typography.labelMedium,
-                        color = OnSurface,
+                        color = JikanOnSurface,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -126,7 +147,7 @@ fun TaskCard(
                         else
                             Icons.Outlined.NotificationsOff,
                         contentDescription = null,
-                        tint = if (task.reminder.enabled) Accent else OnSurfaceVariant,
+                        tint = if (task.reminder.enabled) JikanAccent else JikanOnSurfaceVariant,
                         modifier = Modifier.size(16.dp)
                     )
 

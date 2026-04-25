@@ -33,3 +33,12 @@ object Tasks : Table("tasks") {
 
     override val primaryKey = PrimaryKey(id)
 }
+
+object Subtasks : Table("subtasks") {
+    val id = varchar("id", 36)
+    val taskId = varchar("task_id", 36).references(Tasks.id)
+    val title = varchar("title", 255)
+    val isCompleted = bool("is_completed").default(false)
+
+    override val primaryKey = PrimaryKey(id)
+}

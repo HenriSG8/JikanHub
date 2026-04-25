@@ -18,5 +18,6 @@ data class TaskEntity(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val isSynced: Boolean = false,
+    val subtasksJson: String = "[]",    // JSON representation of List<Subtask>
     val isDeleted: Boolean = false      // Soft delete for sync
 )

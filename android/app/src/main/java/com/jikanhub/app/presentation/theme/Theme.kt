@@ -4,38 +4,43 @@ import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
+val LocalIsDarkTheme = staticCompositionLocalOf { true }
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Accent,
-    onPrimary = OnSurface,
-    secondary = PriorityLow,
-    tertiary = PriorityMedium,
-    background = Surface,
-    surface = Surface,
-    surfaceVariant = SurfaceVariant,
-    surfaceContainer = SurfaceContainer,
-    onBackground = OnSurface,
-    onSurface = OnSurface,
-    onSurfaceVariant = OnSurfaceVariant,
-    error = PriorityHigh
+    primary = DarkAccent,
+    onPrimary = DarkOnSurface,
+    secondary = DarkPriorityLow,
+    tertiary = DarkPriorityMedium,
+    background = DarkSurface,
+    surface = DarkSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    surfaceContainer = DarkSurfaceContainer,
+    onBackground = DarkOnSurface,
+    onSurface = DarkOnSurface,
+    onSurfaceVariant = DarkOnSurfaceVariant,
+    error = DarkPriorityHigh
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Accent,
+    primary = LightAccent,
     onPrimary = LightSurface,
-    secondary = PriorityLow,
-    tertiary = PriorityMedium,
+    secondary = LightPriorityLow,
+    tertiary = LightPriorityMedium,
     background = LightSurface,
     surface = LightSurface,
     surfaceVariant = LightSurfaceVariant,
+    surfaceContainer = LightSurfaceContainer,
     onBackground = LightOnSurface,
     onSurface = LightOnSurface,
     onSurfaceVariant = LightOnSurfaceVariant,
-    error = PriorityHigh
+    error = LightPriorityHigh
 )
 
 @Composable
@@ -58,9 +63,11 @@ fun JikanHubTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = JikanTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalIsDarkTheme provides darkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = JikanTypography,
+            content = content
+        )
+    }
 }

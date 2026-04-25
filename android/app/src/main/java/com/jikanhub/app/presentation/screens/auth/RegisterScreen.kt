@@ -40,7 +40,7 @@ fun RegisterScreen(
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Surface, SurfaceContainer)
+                    colors = listOf(JikanSurface, JikanSurfaceContainer)
                 )
             )
             .padding(24.dp)
@@ -53,14 +53,14 @@ fun RegisterScreen(
             Text(
                 text = "Crie sua conta",
                 style = MaterialTheme.typography.headlineLarge,
-                color = Accent,
+                color = JikanAccent,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 2.sp
             )
             Text(
                 text = "Junte-se ao JikanHub e domine o seu tempo.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = OnSurfaceVariant,
+                color = JikanOnSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
@@ -74,9 +74,9 @@ fun RegisterScreen(
                 leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = Accent
+                    focusedBorderColor = JikanAccent,
+                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                    cursorColor = JikanAccent
                 )
             )
 
@@ -90,9 +90,9 @@ fun RegisterScreen(
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = Accent
+                    focusedBorderColor = JikanAccent,
+                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                    cursorColor = JikanAccent
                 )
             )
 
@@ -107,16 +107,16 @@ fun RegisterScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Accent,
-                    unfocusedBorderColor = OnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = Accent
+                    focusedBorderColor = JikanAccent,
+                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                    cursorColor = JikanAccent
                 )
             )
 
             if (uiState.error != null) {
                 Text(
                     text = uiState.error!!,
-                    color = PriorityHigh,
+                    color = JikanPriorityHigh,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -130,13 +130,13 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Accent),
+                colors = ButtonDefaults.buttonColors(containerColor = JikanAccent),
                 enabled = !uiState.isLoading
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(color = Surface, modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(color = JikanSurface, modifier = Modifier.size(24.dp))
                 } else {
-                    Text("CRIAR CONTA", fontWeight = FontWeight.Bold, color = Surface)
+                    Text("CRIAR CONTA", fontWeight = FontWeight.Bold, color = JikanSurface)
                 }
             }
 
@@ -145,7 +145,7 @@ fun RegisterScreen(
             TextButton(onClick = onNavigateToLogin) {
                 Text(
                     text = "Já tem uma conta? Faça login",
-                    color = OnSurfaceVariant,
+                    color = JikanOnSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
