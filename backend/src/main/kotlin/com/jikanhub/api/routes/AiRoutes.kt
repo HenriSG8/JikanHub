@@ -21,7 +21,7 @@ import kotlinx.serialization.json.Json
 // Groq API response models (OpenAI compatible)
 @Serializable
 data class GroqRequest(
-    val model: String = "llama3-70b-8192",
+    val model: String = "llama-3.3-70b-versatile",
     val messages: List<GroqMessage>,
     val temperature: Double = 0.7,
     val max_tokens: Int = 512
@@ -85,7 +85,7 @@ fun Route.aiRoutes() {
                         contentType(ContentType.Application.Json)
                         header("Authorization", "Bearer $apiKey")
                         setBody(GroqRequest(
-                            model = "llama3-70b-8192",
+                            model = "llama-3.3-70b-versatile",
                             messages = listOf(
                                 GroqMessage(role = "user", content = prompt)
                             ),
