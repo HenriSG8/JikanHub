@@ -37,4 +37,36 @@
     <string name="settings_sync_manual">Sincronização Manual</string>
     <string name="settings_sync_now">Sincronizar Agora</string>
     <string name="settings_sync_running">Sincronizando...</string>
+    <string name="label_checklist">Checklist</string>
+    <string name="label_no_description">Sem descrição</string>
+    <string name="action_delete_task">Excluir Tarefa</string>
+
+
+    <!-- Priority -->
+    <string name="priority_low">Baixa</string>
+    <string name="priority_medium">Média</string>
+    <string name="priority_high">Alta</string>
+
+    <!-- Status -->
+    <string name="status_pending">Pendente</string>
+    <string name="status_completed">Concluída</string>
+
+    <!-- Days of the week -->
+    <string name="day_monday">Segunda-feira</string>
+    <string name="day_tuesday">Terça-feira</string>
+    <string name="day_wednesday">Quarta-feira</string>
+    <string name="day_thursday">Quinta-feira</string>
+    <string name="day_friday">Sexta-feira</string>
+    <string name="day_saturday">Sábado</string>
+    <string name="day_sunday">Domingo</string>
+    <string name="stats_completion_rate">Taxa de Conclusão</string>
+    <string name="stats_monthly_highlight">Destaque do Mês</string>
+    <string name="stats_priority_distribution">Distribuição por Prioridade</string>
+    <string name="stats_efficiency">Eficiência</string>
+    <string name="stats_tasks_created">%1$d tarefas criadas este mês</string>
+    <string name="stats_most_productive_day">Seu dia mais produtivo é %1$s</string>
+    <string name="stats_completed">Concluídas</string>
+    <string name="stats_pending">Pendentes</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_reschedule_today">Reagendar para Hoje</string>
 </resources>

@@ -10,4 +10,5 @@ interface AuthRepository {
     suspend fun loginWithGoogle(request: GoogleAuthRequest): Result<AuthResponse>
     suspend fun logout()
     suspend fun isLoggedIn(): Boolean
+    suspend fun deleteAccount(): Result<Unit>
 }

@@ -89,4 +89,27 @@
     <string name="settings_sync_manual">Manual Sync</string>
     <string name="settings_sync_now">Sync Now</string>
     <string name="settings_sync_running">Syncing...</string>
+    <string name="label_checklist">Checklist</string>
+    <string name="label_no_description">No description</string>
+    <string name="action_delete_task">Delete Task</string>
+
+
+    <!-- Days of the week -->
+    <string name="day_monday">Monday</string>
+    <string name="day_tuesday">Tuesday</string>
+    <string name="day_wednesday">Wednesday</string>
+    <string name="day_thursday">Thursday</string>
+    <string name="day_friday">Friday</string>
+    <string name="day_saturday">Saturday</string>
+    <string name="day_sunday">Sunday</string>
+    <string name="stats_completion_rate">Completion Rate</string>
+    <string name="stats_monthly_highlight">Monthly Highlight</string>
+    <string name="stats_priority_distribution">Priority Distribution</string>
+    <string name="stats_efficiency">Efficiency</string>
+    <string name="stats_tasks_created">%1$d tasks created this month</string>
+    <string name="stats_most_productive_day">Your most productive day is %1$s</string>
+    <string name="stats_completed">Completed</string>
+    <string name="stats_pending">Pending</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_reschedule_today">Reschedule for Today</string>
 </resources>

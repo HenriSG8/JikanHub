@@ -16,11 +16,15 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val tokenManager: TokenManager,
-    private val syncTasks: com.jikanhub.app.domain.usecase.SyncTasksUseCase
+    private val syncTasks: com.jikanhub.app.domain.usecase.SyncTasksUseCase,
+    private val authRepository: com.jikanhub.app.domain.repository.AuthRepository
 ) : ViewModel() {
 
     private val _isSyncing = MutableStateFlow(false)
     val isSyncing = _isSyncing.asStateFlow()
+
+    private val _isDeleting = MutableStateFlow(false)
+    val isDeleting = _isDeleting.asStateFlow()
 
     val notificationSoundUri: StateFlow<String?> = tokenManager.notificationSoundUri
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
@@ -36,6 +40,17 @@ class SettingsViewModel @Inject constructor(
             _isSyncing.value = true
             syncTasks(forceForeground = true)
             _isSyncing.value = false
+        }
+    }
+
+    fun deleteAccount(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _isDeleting.value = true
+            val result = authRepository.deleteAccount()
+            if (result.isSuccess) {
+                onSuccess()
+            }
+            _isDeleting.value = false
         }
     }
 }

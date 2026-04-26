@@ -15,7 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jikanhub.app.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jikanhub.app.presentation.theme.*
 
@@ -44,14 +46,14 @@ fun StatsContent(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 StatSmallCard(
                     modifier = Modifier.weight(1f),
-                    title = "Concluídas",
+                    title = stringResource(R.string.stats_completed),
                     value = uiState.completedCount.toString(),
                     icon = Icons.Default.CheckCircle,
                     color = Completed
                 )
                 StatSmallCard(
                     modifier = Modifier.weight(1f),
-                    title = "Pendentes",
+                    title = stringResource(R.string.stats_pending),
                     value = uiState.pendingCount.toString(),
                     icon = Icons.Default.PendingActions,
                     color = JikanPriorityMedium
@@ -76,7 +78,7 @@ private fun MainStatsCard(state: StatsUiState) {
     ) {
         Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Taxa de Conclusão",
+                text = stringResource(R.string.stats_completion_rate),
                 style = MaterialTheme.typography.titleMedium,
                 color = JikanOnSurfaceVariant
             )
@@ -99,7 +101,7 @@ private fun MainStatsCard(state: StatsUiState) {
                         color = JikanOnSurface
                     )
                     Text(
-                        text = "Eficiência",
+                        text = stringResource(R.string.stats_efficiency),
                         style = MaterialTheme.typography.labelMedium,
                         color = JikanOnSurfaceVariant
                     )
@@ -108,7 +110,7 @@ private fun MainStatsCard(state: StatsUiState) {
             
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "${state.totalCount} tarefas criadas este mês",
+                text = stringResource(R.string.stats_tasks_created, state.totalCount),
                 style = MaterialTheme.typography.bodyMedium,
                 color = JikanOnSurfaceVariant
             )
@@ -154,13 +156,23 @@ private fun InsightsCard(state: StatsUiState) {
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = "Destaque do Mês",
+                    text = stringResource(R.string.stats_monthly_highlight),
                     style = MaterialTheme.typography.titleSmall,
                     color = JikanAccent,
                     fontWeight = FontWeight.Bold
                 )
+                val dayTranslated = when (state.mostProductiveDay) {
+                    "MONDAY" -> stringResource(R.string.day_monday)
+                    "TUESDAY" -> stringResource(R.string.day_tuesday)
+                    "WEDNESDAY" -> stringResource(R.string.day_wednesday)
+                    "THURSDAY" -> stringResource(R.string.day_thursday)
+                    "FRIDAY" -> stringResource(R.string.day_friday)
+                    "SATURDAY" -> stringResource(R.string.day_saturday)
+                    "SUNDAY" -> stringResource(R.string.day_sunday)
+                    else -> state.mostProductiveDay
+                }
                 Text(
-                    text = "Seu dia mais produtivo é ${state.mostProductiveDay}",
+                    text = stringResource(R.string.stats_most_productive_day, dayTranslated),
                     style = MaterialTheme.typography.bodyMedium,
                     color = JikanOnSurface
                 )
@@ -178,7 +190,7 @@ private fun PriorityDistributionCard(state: StatsUiState) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                text = "Distribuição por Prioridade",
+                text = stringResource(R.string.stats_priority_distribution),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = JikanOnSurface
@@ -187,9 +199,9 @@ private fun PriorityDistributionCard(state: StatsUiState) {
             
             state.priorityStats.forEach { (priority, count) ->
                 val label = when(priority) {
-                    com.jikanhub.app.domain.model.Priority.HIGH -> "Alta"
-                    com.jikanhub.app.domain.model.Priority.MEDIUM -> "Média"
-                    com.jikanhub.app.domain.model.Priority.LOW -> "Baixa"
+                    com.jikanhub.app.domain.model.Priority.HIGH -> stringResource(R.string.priority_high)
+                    com.jikanhub.app.domain.model.Priority.MEDIUM -> stringResource(R.string.priority_medium)
+                    com.jikanhub.app.domain.model.Priority.LOW -> stringResource(R.string.priority_low)
                 }
                 val color = when(priority) {
                     com.jikanhub.app.domain.model.Priority.HIGH -> JikanPriorityHigh

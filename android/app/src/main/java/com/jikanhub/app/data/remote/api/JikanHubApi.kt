@@ -15,6 +15,9 @@ interface JikanHubApi {
     @POST("api/auth/google")
     suspend fun googleAuth(@Body request: GoogleAuthRequest): AuthResponse
 
+    @DELETE("api/auth/me")
+    suspend fun deleteAccount()
+
     // === Tasks ===
     @GET("api/tasks")
     suspend fun getTasksByDate(@Query("date") date: String): List<TaskDto>

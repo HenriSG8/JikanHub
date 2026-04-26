@@ -11,6 +11,11 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import com.jikanhub.api.config.userId
+import com.jikanhub.api.db.Subtasks
+import com.jikanhub.api.db.Tasks
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
@@ -98,7 +103,9 @@ fun Route.authRoutes() {
             try {
                 val client = io.ktor.client.HttpClient(io.ktor.client.engine.cio.CIO) {
                     install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-                        json()
+                        json(kotlinx.serialization.json.Json {
+                            ignoreUnknownKeys = true
+                        })
                     }
                 }
 
@@ -145,6 +152,30 @@ fun Route.authRoutes() {
                 )
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Google Auth failed: ${e.message}"))
+            }
+        }
+    }
+
+    authenticate("auth-jwt") {
+        route("/api/auth") {
+            delete("/me") {
+                val userId = call.userId()
+                
+                transaction {
+                    // 1. Delete Subtasks
+                    val taskIds = Tasks.selectAll().where { Tasks.userId eq userId }.map { it[Tasks.id] }
+                    taskIds.forEach { tId ->
+                        Subtasks.deleteWhere { Subtasks.taskId eq tId }
+                    }
+                    
+                    // 2. Delete Tasks
+                    Tasks.deleteWhere { Tasks.userId eq userId }
+                    
+                    // 3. Delete User
+                    Users.deleteWhere { Users.id eq userId }
+                }
+                
+                call.respond(HttpStatusCode.NoContent)
             }
         }
     }

@@ -49,6 +49,13 @@ fun DashboardScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    
+    // Safety: Reset drawer state on entry to prevent transition glitches
+    LaunchedEffect(Unit) {
+        if (drawerState.isOpen) {
+            drawerState.snapTo(DrawerValue.Closed)
+        }
+    }
 
     val dateFormatter = remember {
         DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy", Locale.getDefault())
@@ -152,6 +159,22 @@ fun DashboardScreen(
                     )
                 )
                 NavigationDrawerItem(
+                    label = { Text("Sobre") },
+                    selected = uiState.currentTab == DashboardTab.ABOUT,
+                    onClick = { 
+                        viewModel.changeTab(DashboardTab.ABOUT)
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.Info, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = JikanAccent.copy(alpha = 0.15f),
+                        selectedIconColor = JikanAccent,
+                        selectedTextColor = JikanOnSurface,
+                        unselectedIconColor = JikanOnSurfaceVariant
+                    )
+                )
+                NavigationDrawerItem(
                     label = { Text(stringResource(R.string.drawer_settings)) },
                     selected = false,
                     onClick = { 
@@ -213,7 +236,11 @@ fun DashboardScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                        IconButton(onClick = { 
+                            if (!drawerState.isAnimationRunning) {
+                                scope.launch { drawerState.open() } 
+                            }
+                        }) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Menu",
@@ -224,6 +251,15 @@ fun DashboardScreen(
                         if (uiState.currentTab == DashboardTab.STATS) {
                             Text(
                                 text = "Estatísticas",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = JikanOnSurface,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                        if (uiState.currentTab == DashboardTab.ABOUT) {
+                            Text(
+                                text = "Sobre",
                                 style = MaterialTheme.typography.titleLarge,
                                 color = JikanOnSurface,
                                 fontWeight = FontWeight.Bold,
@@ -252,6 +288,7 @@ fun DashboardScreen(
                         viewModel = viewModel
                     )
                     DashboardTab.STATS -> StatsContent()
+                    DashboardTab.ABOUT -> com.jikanhub.app.presentation.screens.about.AboutContent()
                 }
             }
         }

@@ -123,6 +123,58 @@ fun SettingsScreen(
                 ManualSyncItem(
                     viewModel = hiltViewModel()
                 )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Delete Account Section
+                var showDeleteDialog by remember { mutableStateOf(false) }
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                val isDeleting by settingsViewModel.isDeleting.collectAsState()
+
+                if (showDeleteDialog) {
+                    AlertDialog(
+                        onDismissRequest = { if (!isDeleting) showDeleteDialog = false },
+                        title = { Text("Excluir Conta") },
+                        text = { Text("Tem certeza que deseja excluir sua conta permanentemente? Todos os seus dados e tarefas serão apagados e esta ação não pode ser desfeita.") },
+                        confirmButton = {
+                            TextButton(
+                                onClick = { 
+                                    settingsViewModel.deleteAccount {
+                                        onNavigateBack() // This will pop back to dashboard which will then pop to login
+                                    }
+                                },
+                                enabled = !isDeleting,
+                                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                            ) {
+                                if (isDeleting) {
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                                } else {
+                                    Text("Excluir")
+                                }
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = { showDeleteDialog = false },
+                                enabled = !isDeleting
+                            ) {
+                                Text("Cancelar")
+                            }
+                        }
+                    )
+                }
+
+                Button(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f),
+                        contentColor = MaterialTheme.colorScheme.error
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.2f))
+                ) {
+                    Text("Excluir Minha Conta", fontWeight = FontWeight.Bold)
+                }
             }
         }
     }

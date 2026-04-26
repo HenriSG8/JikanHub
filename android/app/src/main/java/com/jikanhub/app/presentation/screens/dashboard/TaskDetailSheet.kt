@@ -50,21 +50,26 @@ fun TaskDetailSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Priority Tag
+            val priorityLabel = when (task.priority) {
+                com.jikanhub.app.domain.model.Priority.HIGH -> stringResource(R.string.priority_high)
+                com.jikanhub.app.domain.model.Priority.MEDIUM -> stringResource(R.string.priority_medium)
+                com.jikanhub.app.domain.model.Priority.LOW -> stringResource(R.string.priority_low)
+            }
             Surface(
-                color = when (task.priority.name) {
-                    "HIGH" -> JikanPriorityHigh.copy(alpha = 0.2f)
-                    "MEDIUM" -> JikanPriorityMedium.copy(alpha = 0.2f)
+                color = when (task.priority) {
+                    com.jikanhub.app.domain.model.Priority.HIGH -> JikanPriorityHigh.copy(alpha = 0.2f)
+                    com.jikanhub.app.domain.model.Priority.MEDIUM -> JikanPriorityMedium.copy(alpha = 0.2f)
                     else -> JikanPriorityLow.copy(alpha = 0.2f)
                 },
                 shape = MaterialTheme.shapes.small
             ) {
                 Text(
-                    text = task.priority.name,
+                    text = priorityLabel.uppercase(),
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelSmall,
-                    color = when (task.priority.name) {
-                        "HIGH" -> JikanPriorityHigh
-                        "MEDIUM" -> JikanPriorityMedium
+                    color = when (task.priority) {
+                        com.jikanhub.app.domain.model.Priority.HIGH -> JikanPriorityHigh
+                        com.jikanhub.app.domain.model.Priority.MEDIUM -> JikanPriorityMedium
                         else -> JikanPriorityLow
                     }
                 )
@@ -87,7 +92,7 @@ fun TaskDetailSheet(
                 IconButton(onClick = { onEdit(task) }) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar",
+                        contentDescription = stringResource(R.string.action_edit),
                         tint = JikanAccent
                     )
                 }
@@ -108,7 +113,7 @@ fun TaskDetailSheet(
                 ) {
                     Icon(Icons.Default.Event, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Reagendar para Hoje")
+                    Text(stringResource(R.string.action_reschedule_today))
                 }
             }
 
@@ -153,9 +158,8 @@ fun TaskDetailSheet(
 
             HorizontalDivider(color = JikanOnSurfaceVariant.copy(alpha = 0.1f))
 
-            // Description
             Text(
-                text = if (task.description.isBlank()) "Sem descrição" else task.description,
+                text = if (task.description.isBlank()) stringResource(R.string.label_no_description) else task.description,
                 style = MaterialTheme.typography.bodyLarge,
                 color = JikanOnSurface
             )
@@ -163,7 +167,7 @@ fun TaskDetailSheet(
             if (task.subtasks.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Checklist",
+                    text = stringResource(R.string.label_checklist),
                     style = MaterialTheme.typography.titleMedium,
                     color = JikanOnSurface,
                     fontWeight = FontWeight.Bold
@@ -206,7 +210,7 @@ fun TaskDetailSheet(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = JikanPriorityHigh),
                 border = androidx.compose.foundation.BorderStroke(1.dp, JikanPriorityHigh.copy(alpha = 0.3f))
             ) {
-                Text("Excluir Tarefa")
+                Text(stringResource(R.string.action_delete_task))
             }
         }
     }
