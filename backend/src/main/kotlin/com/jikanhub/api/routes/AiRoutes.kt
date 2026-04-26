@@ -84,9 +84,12 @@ fun Route.aiRoutes() {
                         contentType(ContentType.Application.Json)
                         header("Authorization", "Bearer $apiKey")
                         setBody(GroqRequest(
+                            model = "llama3-70b-8192",
                             messages = listOf(
                                 GroqMessage(role = "user", content = prompt)
-                            )
+                            ),
+                            temperature = 0.7,
+                            max_tokens = 512
                         ))
                     }
 
