@@ -44,6 +44,7 @@ fun CreateTaskSheet(
         if (taskToEdit != null) {
             viewModel.loadTaskForEdit(taskToEdit)
         } else {
+            viewModel.resetState()
             viewModel.updateDate(initialDate)
         }
     }

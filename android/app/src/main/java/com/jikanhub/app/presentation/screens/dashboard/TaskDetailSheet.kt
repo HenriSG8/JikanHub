@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import java.time.LocalDate
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +86,7 @@ fun TaskDetailSheet(
                 
                 IconButton(onClick = { onEdit(task) }) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Default.Edit,
+                        imageVector = Icons.Default.Edit,
                         contentDescription = "Editar",
                         tint = JikanAccent
                     )
@@ -106,7 +106,7 @@ fun TaskDetailSheet(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = JikanAccent)
                 ) {
-                    Icon(androidx.compose.material.icons.Icons.Default.CalendarToday, contentDescription = null)
+                    Icon(Icons.Default.Event, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Reagendar para Hoje")
                 }

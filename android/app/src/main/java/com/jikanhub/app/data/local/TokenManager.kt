@@ -21,6 +21,18 @@ class TokenManager @Inject constructor(
     private val TOKEN_KEY = stringPreferencesKey("jwt_token")
     private val NAME_KEY = stringPreferencesKey("user_name")
     private val DARK_MODE_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("dark_mode")
+    private val NOTIFICATION_SOUND_KEY = stringPreferencesKey("notification_sound_uri")
+
+    val notificationSoundUri: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[NOTIFICATION_SOUND_KEY]
+        }
+
+    suspend fun setNotificationSound(uri: String) {
+        context.dataStore.edit { preferences ->
+            preferences[NOTIFICATION_SOUND_KEY] = uri
+        }
+    }
 
     val token: Flow<String?> = context.dataStore.data
         .map { preferences ->

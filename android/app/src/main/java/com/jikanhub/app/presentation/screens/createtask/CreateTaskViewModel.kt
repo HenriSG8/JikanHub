@@ -18,8 +18,16 @@ import javax.inject.Inject
 class CreateTaskViewModel @Inject constructor(
     private val createTaskUseCase: CreateTaskUseCase,
     private val updateTaskUseCase: com.jikanhub.app.domain.usecase.UpdateTaskUseCase,
-    private val api: JikanHubApi
+    private val api: JikanHubApi,
+    private val application: android.app.Application
 ) : ViewModel() {
+
+    private fun updateWidgets() {
+        viewModelScope.launch {
+            com.jikanhub.app.presentation.widgets.WidgetUpdater.updateAllWidgets(application)
+        }
+    }
+
 
     private val _uiState = MutableStateFlow(CreateTaskUiState())
     val uiState: StateFlow<CreateTaskUiState> = _uiState.asStateFlow()
@@ -28,6 +36,11 @@ class CreateTaskViewModel @Inject constructor(
     val taskCreated: SharedFlow<Unit> = _taskCreated.asSharedFlow()
 
     private var editingTaskId: String? = null
+    
+    fun resetState() {
+        _uiState.value = CreateTaskUiState()
+        editingTaskId = null
+    }
 
     fun loadTaskForEdit(task: Task) {
         editingTaskId = task.id
@@ -194,6 +207,7 @@ class CreateTaskViewModel @Inject constructor(
                 
                 _uiState.value = CreateTaskUiState() // Reseta o estado (limpa os campos)
                 editingTaskId = null
+                updateWidgets()
                 _taskCreated.emit(Unit)
             } catch (e: Exception) {
                 _uiState.update {

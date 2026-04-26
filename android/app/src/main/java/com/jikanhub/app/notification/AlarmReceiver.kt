@@ -9,8 +9,17 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.jikanhub.app.MainActivity
 import com.jikanhub.app.R
+import com.jikanhub.app.data.local.TokenManager
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AlarmReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var tokenManager: TokenManager
 
     companion object {
         const val EXTRA_TASK_ID = "extra_task_id"
@@ -29,15 +38,38 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationManager =
             context.getSystemService(NotificationManager::class.java)
 
+        // Get saved sound URI
+        val soundUriString = runBlocking { tokenManager.notificationSoundUri.first() }
+        val soundUri = if (soundUriString != null) {
+            android.net.Uri.parse(soundUriString)
+        } else {
+            android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+        }
+
+        // Use a dynamic channel ID based on the sound to force updates on Android 8+
+        val dynamicChannelId = "${CHANNEL_ID}_${soundUriString?.hashCode() ?: "default"}"
+
         // Create channel
         val channel = NotificationChannel(
-            CHANNEL_ID,
+            dynamicChannelId,
             CHANNEL_NAME,
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "Reminders for your scheduled tasks"
             enableVibration(true)
+            setSound(soundUri, android.media.AudioAttributes.Builder()
+                .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build())
         }
+        
+        // Clean up old channels of this app if they exist (optional but cleaner)
+        notificationManager.notificationChannels.forEach { existingChannel ->
+            if (existingChannel.id.startsWith(CHANNEL_ID) && existingChannel.id != dynamicChannelId) {
+                notificationManager.deleteNotificationChannel(existingChannel.id)
+            }
+        }
+        
         notificationManager.createNotificationChannel(channel)
 
         // Create tap intent
@@ -50,12 +82,13 @@ class AlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, dynamicChannelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSound(soundUri)
             .setAutoCancel(true)
             .setContentIntent(tapPendingIntent)
             .build()
@@ -64,3 +97,4 @@ class AlarmReceiver : BroadcastReceiver() {
         notificationManager.notify(notificationId, notification)
     }
 }
+

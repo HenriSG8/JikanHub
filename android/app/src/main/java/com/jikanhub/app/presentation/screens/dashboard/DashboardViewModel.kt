@@ -22,8 +22,16 @@ class DashboardViewModel @Inject constructor(
     private val deleteTask: com.jikanhub.app.domain.usecase.DeleteTaskUseCase,
     private val updateTask: com.jikanhub.app.domain.usecase.UpdateTaskUseCase,
     private val alarmScheduler: com.jikanhub.app.notification.AlarmScheduler,
-    private val tokenManager: com.jikanhub.app.data.local.TokenManager
+    private val tokenManager: com.jikanhub.app.data.local.TokenManager,
+    private val application: android.app.Application
 ) : ViewModel() {
+
+    private fun updateWidgets() {
+        viewModelScope.launch {
+            com.jikanhub.app.presentation.widgets.WidgetUpdater.updateAllWidgets(application)
+        }
+    }
+
 
     private var tasksJob: kotlinx.coroutines.Job? = null
 
@@ -38,6 +46,7 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             deleteTask.invoke(taskId)
             selectTask(null)
+            updateWidgets()
         }
     }
 
@@ -124,6 +133,7 @@ class DashboardViewModel @Inject constructor(
                 TaskStatus.COMPLETED
             }
             updateTaskStatus(taskId, newStatus)
+            updateWidgets()
         }
     }
 

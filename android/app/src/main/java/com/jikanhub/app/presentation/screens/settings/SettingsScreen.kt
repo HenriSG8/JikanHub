@@ -1,10 +1,15 @@
 package com.jikanhub.app.presentation.screens.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,8 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jikanhub.app.R
 import com.jikanhub.app.presentation.theme.JikanOnSurface
+import com.jikanhub.app.presentation.theme.JikanOnSurfaceVariant
 import com.jikanhub.app.presentation.theme.JikanSurface
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,10 +96,94 @@ fun SettingsScreen(
                         AppCompatDelegate.setApplicationLocales(appLocale)
                     }
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.settings_notification_sound),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JikanOnSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                SoundPickerItem(
+                    viewModel = hiltViewModel()
+                )
             }
         }
     }
 }
+
+@Composable
+private fun SoundPickerItem(
+    viewModel: SettingsViewModel
+) {
+    val context = LocalContext.current
+    val soundUri by viewModel.notificationSoundUri.collectAsState()
+    
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val uri = result.data?.getParcelableExtra<android.net.Uri>(android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            uri?.let { viewModel.saveNotificationSound(it.toString()) }
+        }
+    }
+
+    Surface(
+        onClick = {
+            val intent = android.content.Intent(android.media.RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TYPE, android.media.RingtoneManager.TYPE_NOTIFICATION)
+                putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TITLE, "Selecione o som")
+                putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, soundUri?.let { android.net.Uri.parse(it) })
+                putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
+            }
+            launcher.launch(intent)
+        },
+        color = JikanSurface,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth(),
+        border = androidx.compose.foundation.BorderStroke(1.dp, JikanOnSurface.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    androidx.compose.material.icons.Icons.Default.NotificationsActive,
+                    contentDescription = null,
+                    tint = JikanOnSurface
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = stringResource(R.string.settings_pick_sound),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = JikanOnSurface
+                    )
+                    soundUri?.let {
+                        Text(
+                            text = android.media.RingtoneManager.getRingtone(context, android.net.Uri.parse(it)).getTitle(context),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = JikanOnSurfaceVariant
+                        )
+                    }
+                }
+            }
+            Icon(
+                androidx.compose.material.icons.Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = JikanOnSurfaceVariant
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun LanguageItem(

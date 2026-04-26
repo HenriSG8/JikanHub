@@ -53,9 +53,6 @@ fun JikanNavHost(
                 },
                 onNavigateToSettings = {
                     navController.navigate("settings")
-                },
-                onNavigateToStats = {
-                    navController.navigate("stats")
                 }
             )
         }

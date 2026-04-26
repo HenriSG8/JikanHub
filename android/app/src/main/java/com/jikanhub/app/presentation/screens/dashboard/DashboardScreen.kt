@@ -104,7 +104,7 @@ fun DashboardScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.drawer_home)) },
+                    label = { Text(stringResource(R.string.drawer_tasks_day)) },
                     selected = uiState.currentTab == DashboardTab.TASKS_OF_DAY,
                     onClick = { 
                         viewModel.changeTab(DashboardTab.TASKS_OF_DAY)
@@ -263,9 +263,9 @@ fun DashboardScreen(
             task = task,
             onDismiss = { viewModel.selectTask(null) },
             onDelete = { viewModel.deleteTask(it) },
-            onUpdateStatus = { t, s -> viewModel.updateTaskStatus(t, s) },
             onEdit = { viewModel.editTask(it) },
-            onReschedule = { viewModel.rescheduleTask(it) }
+            onReschedule = { t, dt -> viewModel.rescheduleTask(t, dt) },
+            onToggleSubtask = { viewModel.toggleSubtask(task, it) }
         )
     }
 
@@ -310,22 +310,8 @@ private fun TasksOfDayContent(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Week Day Selector
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            uiState.weekDays.take(7).forEach { day ->
-                DayItem(
-                    dayItem = day,
-                    onClick = { viewModel.selectDate(day.date) }
-                )
-            }
-        }
-
         Spacer(modifier = Modifier.height(24.dp))
+
 
         // Tasks List
         if (uiState.tasks.isEmpty() && !uiState.isLoading) {
@@ -344,7 +330,7 @@ private fun TasksOfDayContent(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = stringResource(R.string.no_tasks),
+                        text = stringResource(R.string.empty_tasks),
                         style = MaterialTheme.typography.bodyLarge,
                         color = JikanOnSurfaceVariant
                     )
@@ -360,7 +346,7 @@ private fun TasksOfDayContent(
                     TaskCard(
                         task = task,
                         onClick = { viewModel.selectTask(task) },
-                        onStatusChange = { viewModel.updateTaskStatus(task, it) }
+                        onToggleComplete = { viewModel.toggleTaskComplete(task.id, task.status) }
                     )
                 }
                 item { Spacer(modifier = Modifier.height(80.dp)) }
@@ -471,7 +457,7 @@ private fun CalendarContent(
                     TaskCard(
                         task = task,
                         onClick = { viewModel.selectTask(task) },
-                        onStatusChange = { viewModel.updateTaskStatus(task, it) }
+                        onToggleComplete = { viewModel.toggleTaskComplete(task.id, task.status) }
                     )
                 }
             }
