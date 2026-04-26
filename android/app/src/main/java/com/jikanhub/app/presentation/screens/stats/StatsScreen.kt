@@ -1,0 +1,247 @@
+package com.jikanhub.app.presentation.screens.stats
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.PendingActions
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jikanhub.app.R
+import com.jikanhub.app.presentation.theme.*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StatsScreen(
+    onNavigateBack: () -> Unit,
+    viewModel: StatsViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Estatísticas Mensais") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = JikanSurface,
+                    titleContentColor = JikanOnSurface
+                )
+            )
+        },
+        containerColor = JikanSurface
+    ) { paddingValues ->
+        if (uiState.isLoading) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = JikanAccent)
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Main Progress Card
+                MainStatsCard(uiState)
+
+                // Detailed Grid
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    StatSmallCard(
+                        modifier = Modifier.weight(1f),
+                        title = "Concluídas",
+                        value = uiState.completedCount.toString(),
+                        icon = Icons.Default.CheckCircle,
+                        color = Completed
+                    )
+                    StatSmallCard(
+                        modifier = Modifier.weight(1f),
+                        title = "Pendentes",
+                        value = uiState.pendingCount.toString(),
+                        icon = Icons.Default.PendingActions,
+                        color = JikanPriorityMedium
+                    )
+                }
+
+                // Insights Card
+                InsightsCard(uiState)
+
+                // Priority Distribution
+                PriorityDistributionCard(uiState)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MainStatsCard(state: StatsUiState) {
+    Surface(
+        color = JikanSurfaceVariant,
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Taxa de Conclusão",
+                style = MaterialTheme.typography.titleMedium,
+                color = JikanOnSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Box(contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(
+                    progress = { state.completionRate / 100f },
+                    modifier = Modifier.size(140.dp),
+                    color = JikanAccent,
+                    strokeWidth = 12.dp,
+                    trackColor = JikanAccent.copy(alpha = 0.1f),
+                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "${state.completionRate.toInt()}%",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = JikanOnSurface
+                    )
+                    Text(
+                        text = "Eficiência",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = JikanOnSurfaceVariant
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "${state.totalCount} tarefas criadas este mês",
+                style = MaterialTheme.typography.bodyMedium,
+                color = JikanOnSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatSmallCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    value: String,
+    icon: ImageVector,
+    color: Color
+) {
+    Surface(
+        color = JikanSurfaceVariant.copy(alpha = 0.5f),
+        shape = RoundedCornerShape(20.dp),
+        modifier = modifier
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = value, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, color = JikanOnSurface)
+            Text(text = title, style = MaterialTheme.typography.labelMedium, color = JikanOnSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun InsightsCard(state: StatsUiState) {
+    Surface(
+        color = JikanAccent.copy(alpha = 0.05f),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth(),
+        border = androidx.compose.foundation.BorderStroke(1.dp, JikanAccent.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.Star, contentDescription = null, tint = JikanPriorityMedium, modifier = Modifier.size(32.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = "Destaque do Mês",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = JikanAccent,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Seu dia mais produtivo é ${state.mostProductiveDay}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = JikanOnSurface
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PriorityDistributionCard(state: StatsUiState) {
+    Surface(
+        color = JikanSurfaceVariant,
+        shape = RoundedCornerShape(24.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                text = "Distribuição por Prioridade",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = JikanOnSurface
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            state.priorityStats.forEach { (priority, count) ->
+                val label = when(priority) {
+                    com.jikanhub.app.domain.model.Priority.HIGH -> "Alta"
+                    com.jikanhub.app.domain.model.Priority.MEDIUM -> "Média"
+                    com.jikanhub.app.domain.model.Priority.LOW -> "Baixa"
+                }
+                val color = when(priority) {
+                    com.jikanhub.app.domain.model.Priority.HIGH -> JikanPriorityHigh
+                    com.jikanhub.app.domain.model.Priority.MEDIUM -> JikanPriorityMedium
+                    com.jikanhub.app.domain.model.Priority.LOW -> JikanPriorityLow
+                }
+                
+                Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = JikanOnSurface)
+                        Text(text = count.toString(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = JikanOnSurface)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LinearProgressIndicator(
+                        progress = { if (state.totalCount > 0) count.toFloat() / state.totalCount else 0f },
+                        modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
+                        color = color,
+                        trackColor = color.copy(alpha = 0.1f)
+                    )
+                }
+            }
+        }
+    }
+}

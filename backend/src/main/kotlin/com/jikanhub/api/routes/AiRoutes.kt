@@ -70,10 +70,10 @@ fun Route.aiRoutes() {
 
                 val request = call.receive<AiSuggestRequest>()
 
-                if (request.title.isBlank()) {
+                if (request.title.isBlank() && request.description.isBlank()) {
                     call.respond(
                         HttpStatusCode.BadRequest,
-                        ErrorResponse("Title is required")
+                        ErrorResponse("Título ou Descrição são necessários")
                     )
                     return@post
                 }
@@ -123,13 +123,15 @@ fun Route.aiRoutes() {
 }
 
 private fun buildPrompt(title: String, description: String): String {
-    val descPart = if (description.isNotBlank()) {
-        "\nDescrição adicional: $description"
-    } else ""
+    val mainSubject = if (description.isNotBlank()) {
+        "Descrição detalhada: $description" + (if (title.isNotBlank()) "\n(Título: $title)" else "")
+    } else {
+        "Tarefa: $title"
+    }
 
-    return """Você é um assistente de produtividade. O usuário está criando uma tarefa e precisa de sugestões práticas de subtarefas.
+    return """Você é um assistente de produtividade. O usuário está criando uma tarefa e precisa de sugestões práticas de subtarefas baseadas nos detalhes fornecidos.
 
-Tarefa: $title$descPart
+$mainSubject
 
 Gere uma lista de 4 a 8 subtarefas práticas e objetivas para essa tarefa. 
 Cada subtarefa deve ser curta (máximo 5 palavras).

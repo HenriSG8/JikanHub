@@ -14,6 +14,8 @@ import com.jikanhub.app.R
 import com.jikanhub.app.domain.model.Task
 import com.jikanhub.app.presentation.theme.*
 import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
+import java.time.LocalDate
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 
@@ -24,6 +26,7 @@ fun TaskDetailSheet(
     onDismiss: () -> Unit,
     onDelete: (String) -> Unit,
     onEdit: (Task) -> Unit,
+    onReschedule: (Task, LocalDateTime) -> Unit,
     onToggleSubtask: (String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -167,6 +170,24 @@ fun TaskDetailSheet(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            // Reschedule Button (Show only if overdue)
+            val isOverdue = task.dateTime.isBefore(LocalDateTime.now()) && task.status != com.jikanhub.app.domain.model.TaskStatus.COMPLETED
+            if (isOverdue) {
+                Button(
+                    onClick = { 
+                        // Reschedule to today at the same time
+                        val newDateTime = LocalDateTime.of(LocalDate.now(), task.dateTime.toLocalTime())
+                        onReschedule(task, newDateTime)
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = JikanAccent)
+                ) {
+                    Text("Reagendar para Hoje")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             // Delete Button
             OutlinedButton(

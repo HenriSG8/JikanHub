@@ -148,6 +148,14 @@ class DashboardViewModel @Inject constructor(
         _uiState.update { it.copy(taskToEdit = task, showCreateSheet = true, selectedTask = null) }
     }
 
+    fun rescheduleTask(task: com.jikanhub.app.domain.model.Task, newDateTime: java.time.LocalDateTime) {
+        viewModelScope.launch {
+            val updatedTask = task.copy(dateTime = newDateTime)
+            updateTask(updatedTask)
+            selectTask(null)
+        }
+    }
+
     fun clearTaskToEdit() {
         _uiState.update { it.copy(taskToEdit = null) }
     }

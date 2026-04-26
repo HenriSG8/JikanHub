@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TaskDao {
 
+    @Query("SELECT * FROM tasks WHERE isDeleted = 0 ORDER BY dateTime DESC")
+    fun getAllTasks(): Flow<List<TaskEntity>>
+
     @Query("""
         SELECT * FROM tasks 
         WHERE dateTime BETWEEN :startOfDay AND :endOfDay 

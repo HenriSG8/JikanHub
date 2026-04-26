@@ -109,7 +109,7 @@ class CreateTaskViewModel @Inject constructor(
 
     fun requestAiSuggestions() {
         val state = _uiState.value
-        if (state.title.isBlank()) return
+        if (state.title.isBlank() && state.description.isBlank()) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isAiLoading = true, aiError = null) }

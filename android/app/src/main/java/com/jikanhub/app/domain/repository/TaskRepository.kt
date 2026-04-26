@@ -11,6 +11,7 @@ import java.time.LocalDate
  */
 interface TaskRepository {
     fun getTasksByDate(date: LocalDate): Flow<List<Task>>
+    fun getAllTasks(): Flow<List<Task>>
     fun getTaskById(id: String): Flow<Task?>
     fun getTasksWithActiveReminders(): Flow<List<Task>>
     suspend fun createTask(task: Task): Task

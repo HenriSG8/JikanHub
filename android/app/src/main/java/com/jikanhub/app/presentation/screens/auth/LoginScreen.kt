@@ -130,14 +130,24 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Google Login Placeholder
+            val googleAuthManager = remember { com.jikanhub.app.auth.GoogleAuthManager(context) }
+            val scope = rememberCoroutineScope()
+
             OutlinedButton(
-                onClick = { /* Em breve: Login com Google */ },
+                onClick = { 
+                    scope.launch {
+                        val idToken = googleAuthManager.signIn()
+                        if (idToken != null) {
+                            viewModel.loginWithGoogle(idToken)
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, JikanOnSurfaceVariant.copy(alpha = 0.3f))
+                border = androidx.compose.foundation.BorderStroke(1.dp, JikanOnSurfaceVariant.copy(alpha = 0.3f)),
+                enabled = !uiState.isLoading
             ) {
                 Text("Entrar com Google", color = JikanOnSurface)
             }

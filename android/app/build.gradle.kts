@@ -76,6 +76,11 @@ dependencies {
     implementation(libs.hilt.work)
     ksp(libs.hilt.work.compiler)
 
+    // Auth
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
+
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

@@ -11,6 +11,9 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
 import java.util.UUID
 
 fun Route.authRoutes() {
@@ -92,13 +95,64 @@ fun Route.authRoutes() {
         post("/google") {
             val request = call.receive<GoogleAuthRequest>()
 
-            // TODO: Verify Google ID token with Google's API
-            // For now, this is a placeholder that should be implemented
-            // using io.ktor.client to call https://oauth2.googleapis.com/tokeninfo
-            call.respond(
-                HttpStatusCode.NotImplemented,
-                ErrorResponse("Google OAuth verification pending - implement token verification")
-            )
+            try {
+                val client = io.ktor.client.HttpClient(io.ktor.client.engine.cio.CIO) {
+                    install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+                        io.ktor.serialization.kotlinx.json.json()
+                    }
+                }
+
+                // Verify token with Google
+                val googleResponse: io.ktor.client.statement.HttpResponse = client.get("https://oauth2.googleapis.com/tokeninfo") {
+                    parameter("id_token", request.idToken)
+                }
+
+                if (!googleResponse.status.isSuccess()) {
+                    call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Invalid Google token"))
+                    return@post
+                }
+
+                val googleInfo = googleResponse.body<GoogleTokenInfo>()
+                
+                // Check if user exists, if not create
+                var user = transaction {
+                    Users.selectAll().where { Users.email eq googleInfo.email }.firstOrNull()
+                }
+
+                val userId = if (user == null) {
+                    val newId = UUID.randomUUID().toString()
+                    transaction {
+                        Users.insert {
+                            it[id] = newId
+                            it[email] = googleInfo.email
+                            it[passwordHash] = "" // No password for Google users
+                            it[name] = googleInfo.name ?: ""
+                        }
+                    }
+                    newId
+                } else {
+                    user[Users.id]
+                }
+
+                val userName = user?.get(Users.name) ?: googleInfo.name ?: ""
+                val token = JwtConfig.generateToken(userId, googleInfo.email)
+
+                call.respond(
+                    AuthResponse(
+                        token = token,
+                        user = UserDto(id = userId, email = googleInfo.email, name = userName)
+                    )
+                )
+            } catch (e: Exception) {
+                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Google Auth failed: ${e.message}"))
+            }
         }
     }
 }
+
+@kotlinx.serialization.Serializable
+data class GoogleTokenInfo(
+    val email: String,
+    val name: String? = null,
+    val sub: String // Google User ID
+)

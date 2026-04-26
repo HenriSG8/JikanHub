@@ -43,6 +43,7 @@ import java.util.Locale
 fun DashboardScreen(
     onLogout: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToStats: () -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -137,6 +138,17 @@ fun DashboardScreen(
                         selectedTextColor = JikanOnSurface,
                         unselectedIconColor = JikanOnSurfaceVariant
                     )
+                )
+                NavigationDrawerItem(
+                    label = { Text("Estatísticas") },
+                    selected = false,
+                    onClick = { 
+                        scope.launch { drawerState.close() }
+                        onNavigateToStats()
+                    },
+                    icon = { Icon(Icons.Default.BarChart, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    colors = NavigationDrawerItemDefaults.colors(unselectedIconColor = JikanOnSurfaceVariant)
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.drawer_settings)) },
@@ -237,6 +249,7 @@ fun DashboardScreen(
             onDismiss = { viewModel.selectTask(null) },
             onDelete = { viewModel.deleteTask(it) },
             onEdit = { viewModel.editTask(it) },
+            onReschedule = { t, newDate -> viewModel.rescheduleTask(t, newDate) },
             onToggleSubtask = { subtaskId ->
                 viewModel.toggleSubtask(task, subtaskId)
             }

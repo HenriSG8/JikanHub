@@ -53,12 +53,21 @@ fun JikanNavHost(
                 },
                 onNavigateToSettings = {
                     navController.navigate("settings")
+                },
+                onNavigateToStats = {
+                    navController.navigate("stats")
                 }
             )
         }
 
         composable("settings") {
             com.jikanhub.app.presentation.screens.settings.SettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable("stats") {
+            com.jikanhub.app.presentation.screens.stats.StatsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

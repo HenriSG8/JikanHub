@@ -41,5 +41,16 @@ class LoginViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = errorMessage) }
             }
         }
+    fun loginWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            val result = repository.loginWithGoogle(com.jikanhub.app.data.remote.dto.GoogleAuthRequest(idToken))
+            
+            result.onSuccess {
+                _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+            }.onFailure { e ->
+                _uiState.update { it.copy(isLoading = false, error = "Login com Google falhou: ${e.message}") }
+            }
+        }
     }
 }
