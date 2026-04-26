@@ -1,6 +1,8 @@
 package com.jikanhub.app.presentation.screens.dashboard
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -10,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.jikanhub.app.R
 import com.jikanhub.app.domain.model.Task
 import com.jikanhub.app.presentation.theme.*
@@ -42,7 +45,8 @@ fun TaskDetailSheet(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp)
-                .padding(bottom = 16.dp),
+                .padding(bottom = 16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Priority Tag
@@ -86,6 +90,25 @@ fun TaskDetailSheet(
                         contentDescription = "Editar",
                         tint = JikanAccent
                     )
+                }
+            }
+
+            // Reschedule Button (Show only if overdue)
+            val isOverdue = task.dateTime.isBefore(LocalDateTime.now()) && task.status != com.jikanhub.app.domain.model.TaskStatus.COMPLETED
+            if (isOverdue) {
+                Button(
+                    onClick = { 
+                        // Reschedule to today at the same time
+                        val newDateTime = LocalDateTime.of(LocalDate.now(), task.dateTime.toLocalTime())
+                        onReschedule(task, newDateTime)
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = JikanAccent)
+                ) {
+                    Icon(androidx.compose.material.icons.Icons.Default.CalendarToday, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Reagendar para Hoje")
                 }
             }
 
@@ -171,23 +194,7 @@ fun TaskDetailSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Reschedule Button (Show only if overdue)
-            val isOverdue = task.dateTime.isBefore(LocalDateTime.now()) && task.status != com.jikanhub.app.domain.model.TaskStatus.COMPLETED
-            if (isOverdue) {
-                Button(
-                    onClick = { 
-                        // Reschedule to today at the same time
-                        val newDateTime = LocalDateTime.of(LocalDate.now(), task.dateTime.toLocalTime())
-                        onReschedule(task, newDateTime)
-                        onDismiss()
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = JikanAccent)
-                ) {
-                    Text("Reagendar para Hoje")
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+
 
             // Delete Button
             OutlinedButton(

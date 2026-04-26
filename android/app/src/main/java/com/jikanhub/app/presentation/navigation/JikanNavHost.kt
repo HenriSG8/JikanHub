@@ -66,10 +66,5 @@ fun JikanNavHost(
             )
         }
 
-        composable("stats") {
-            com.jikanhub.app.presentation.screens.stats.StatsScreen(
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
     }
 }

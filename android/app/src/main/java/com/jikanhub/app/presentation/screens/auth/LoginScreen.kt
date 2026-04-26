@@ -17,10 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jikanhub.app.R
 import com.jikanhub.app.presentation.theme.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -31,6 +33,8 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) onLoginSuccess()
@@ -131,7 +135,6 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             val googleAuthManager = remember { com.jikanhub.app.auth.GoogleAuthManager(context) }
-            val scope = rememberCoroutineScope()
 
             OutlinedButton(
                 onClick = { 
@@ -139,6 +142,8 @@ fun LoginScreen(
                         val idToken = googleAuthManager.signIn()
                         if (idToken != null) {
                             viewModel.loginWithGoogle(idToken)
+                        } else {
+                            android.widget.Toast.makeText(context, "Não foi possível obter os dados do Google. Verifique sua conexão e configurações.", android.widget.Toast.LENGTH_LONG).show()
                         }
                     }
                 },

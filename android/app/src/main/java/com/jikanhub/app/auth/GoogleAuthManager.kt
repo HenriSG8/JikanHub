@@ -1,21 +1,23 @@
 package com.jikanhub.app.auth
 
+import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class GoogleAuthManager(private val context: Context) {
     private val credentialManager = CredentialManager.create(context)
+    private val TAG = "GoogleAuthManager"
 
-    suspend fun signIn(): String? = withContext(Dispatchers.IO) {
+    suspend fun signIn(): String? {
         try {
             val googleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
-                .setServerClientId("557952229165-030ced6c2tq09fmqobf2v6d4imbpr443.apps.googleusercontent.com")
+                .setServerClientId("557952229165-j0m4bob9cqjfd45ugnb4brm6ofqdc2f9.apps.googleusercontent.com")
                 .setAutoSelectEnabled(true)
                 .build()
 
@@ -23,6 +25,9 @@ class GoogleAuthManager(private val context: Context) {
                 .addCredentialOption(googleIdOption)
                 .build()
 
+            Log.d(TAG, "Iniciando solicitação de credenciais...")
+            
+            // CredentialManager precisa da Activity para mostrar a UI
             val result = credentialManager.getCredential(
                 context = context,
                 request = request
@@ -30,12 +35,16 @@ class GoogleAuthManager(private val context: Context) {
 
             val credential = result.credential
             if (credential is GoogleIdTokenCredential) {
-                return@withContext credential.idToken
+                Log.d(TAG, "Token obtido com sucesso!")
+                return credential.idToken
             }
+            Log.w(TAG, "Tipo de credencial inesperado: ${credential.type}")
             null
+        } catch (e: GetCredentialException) {
+            Log.e(TAG, "Erro do CredentialManager: ${e.message}", e)
         } catch (e: Exception) {
-            e.printStackTrace()
-            null
+            Log.e(TAG, "Erro inesperado no login com Google: ${e.message}", e)
         }
+        return null
     }
 }

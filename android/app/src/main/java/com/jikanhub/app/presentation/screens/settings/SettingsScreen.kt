@@ -27,54 +27,69 @@ fun SettingsScreen(
     val currentLocale = AppCompatDelegate.getApplicationLocales().toLanguageTags()
     
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.drawer_settings)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = JikanSurface,
-                    titleContentColor = JikanOnSurface
-                )
-            )
-        },
         containerColor = JikanSurface
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.settings_language),
-                style = MaterialTheme.typography.titleMedium,
-                color = JikanOnSurface,
-                fontWeight = FontWeight.Bold
-            )
-
-            // Language Options
-            LanguageItem(
-                label = "Português (Brasil)",
-                selected = currentLocale.contains("pt"),
-                onClick = {
-                    val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("pt-BR")
-                    AppCompatDelegate.setApplicationLocales(appLocale)
+            // ── Custom Top Bar ──
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Voltar",
+                        tint = JikanOnSurface,
+                        modifier = Modifier.size(28.dp)
+                    )
                 }
-            )
+                Text(
+                    text = stringResource(R.string.drawer_settings),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = JikanOnSurface,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
 
-            LanguageItem(
-                label = "English",
-                selected = currentLocale.contains("en") || currentLocale.isEmpty(),
-                onClick = {
-                    val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
-                    AppCompatDelegate.setApplicationLocales(appLocale)
-                }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.settings_language),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JikanOnSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Language Options
+                LanguageItem(
+                    label = "Português (Brasil)",
+                    selected = currentLocale.contains("pt"),
+                    onClick = {
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("pt-BR")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                    }
+                )
+
+                LanguageItem(
+                    label = "English",
+                    selected = currentLocale.contains("en") || currentLocale.isEmpty(),
+                    onClick = {
+                        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
+                        AppCompatDelegate.setApplicationLocales(appLocale)
+                    }
+                )
+            }
         }
     }
 }

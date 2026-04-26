@@ -3,6 +3,7 @@ package com.jikanhub.app.presentation.screens.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jikanhub.app.data.remote.dto.AuthRequest
+import com.jikanhub.app.data.remote.dto.GoogleAuthRequest
 import com.jikanhub.app.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,10 +42,12 @@ class LoginViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = errorMessage) }
             }
         }
+    }
+
     fun loginWithGoogle(idToken: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val result = repository.loginWithGoogle(com.jikanhub.app.data.remote.dto.GoogleAuthRequest(idToken))
+            val result = repository.loginWithGoogle(GoogleAuthRequest(idToken))
             
             result.onSuccess {
                 _uiState.update { it.copy(isLoading = false, isSuccess = true) }

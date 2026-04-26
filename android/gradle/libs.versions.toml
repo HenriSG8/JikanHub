@@ -22,6 +22,7 @@ splashScreen = "1.0.1"
 material3 = "1.3.1"
 credentials = "1.3.0"
 googleid = "1.1.1"
+appcompat = "1.7.0"
 
 [libraries]
 # Core
@@ -34,6 +35,7 @@ androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", v
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 # Compose
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }

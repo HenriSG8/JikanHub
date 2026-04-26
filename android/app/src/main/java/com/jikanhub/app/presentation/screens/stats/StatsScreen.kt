@@ -1,18 +1,11 @@
 package com.jikanhub.app.presentation.screens.stats
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.PendingActions
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,80 +13,56 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.jikanhub.app.R
 import com.jikanhub.app.presentation.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen(
-    onNavigateBack: () -> Unit,
+fun StatsContent(
     viewModel: StatsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Estatísticas Mensais") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = JikanSurface,
-                    titleContentColor = JikanOnSurface
+    if (uiState.isLoading) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = JikanAccent)
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Main Progress Card
+            MainStatsCard(uiState)
+
+            // Detailed Grid
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                StatSmallCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Concluídas",
+                    value = uiState.completedCount.toString(),
+                    icon = Icons.Default.CheckCircle,
+                    color = Completed
                 )
-            )
-        },
-        containerColor = JikanSurface
-    ) { paddingValues ->
-        if (uiState.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = JikanAccent)
+                StatSmallCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Pendentes",
+                    value = uiState.pendingCount.toString(),
+                    icon = Icons.Default.PendingActions,
+                    color = JikanPriorityMedium
+                )
             }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Main Progress Card
-                MainStatsCard(uiState)
 
-                // Detailed Grid
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    StatSmallCard(
-                        modifier = Modifier.weight(1f),
-                        title = "Concluídas",
-                        value = uiState.completedCount.toString(),
-                        icon = Icons.Default.CheckCircle,
-                        color = Completed
-                    )
-                    StatSmallCard(
-                        modifier = Modifier.weight(1f),
-                        title = "Pendentes",
-                        value = uiState.pendingCount.toString(),
-                        icon = Icons.Default.PendingActions,
-                        color = JikanPriorityMedium
-                    )
-                }
+            // Insights Card
+            InsightsCard(uiState)
 
-                // Insights Card
-                InsightsCard(uiState)
-
-                // Priority Distribution
-                PriorityDistributionCard(uiState)
-            }
+            // Priority Distribution
+            PriorityDistributionCard(uiState)
         }
     }
 }

@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jikanhub.app.R
 import com.jikanhub.app.presentation.components.TaskCard
 import com.jikanhub.app.presentation.screens.createtask.CreateTaskSheet
+import com.jikanhub.app.presentation.screens.stats.StatsContent
 import com.jikanhub.app.presentation.theme.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -43,7 +44,6 @@ import java.util.Locale
 fun DashboardScreen(
     onLogout: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    onNavigateToStats: () -> Unit = {},
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -101,26 +101,22 @@ fun DashboardScreen(
                     )
                 }
 
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    color = JikanOnSurfaceVariant.copy(alpha = 0.1f)
-                )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // Menu Items
                 NavigationDrawerItem(
-                    label = { Text(stringResource(R.string.drawer_tasks_day)) },
+                    label = { Text(stringResource(R.string.drawer_home)) },
                     selected = uiState.currentTab == DashboardTab.TASKS_OF_DAY,
                     onClick = { 
                         viewModel.changeTab(DashboardTab.TASKS_OF_DAY)
                         scope.launch { drawerState.close() } 
                     },
-                    icon = { Icon(Icons.Default.Today, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     colors = NavigationDrawerItemDefaults.colors(
                         selectedContainerColor = JikanAccent.copy(alpha = 0.15f),
                         selectedIconColor = JikanAccent,
-                        selectedTextColor = JikanOnSurface
+                        selectedTextColor = JikanOnSurface,
+                        unselectedIconColor = JikanOnSurfaceVariant
                     )
                 )
                 NavigationDrawerItem(
@@ -141,14 +137,19 @@ fun DashboardScreen(
                 )
                 NavigationDrawerItem(
                     label = { Text("Estatísticas") },
-                    selected = false,
+                    selected = uiState.currentTab == DashboardTab.STATS,
                     onClick = { 
+                        viewModel.changeTab(DashboardTab.STATS)
                         scope.launch { drawerState.close() }
-                        onNavigateToStats()
                     },
                     icon = { Icon(Icons.Default.BarChart, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                    colors = NavigationDrawerItemDefaults.colors(unselectedIconColor = JikanOnSurfaceVariant)
+                    colors = NavigationDrawerItemDefaults.colors(
+                        selectedContainerColor = JikanAccent.copy(alpha = 0.15f),
+                        selectedIconColor = JikanAccent,
+                        selectedTextColor = JikanOnSurface,
+                        unselectedIconColor = JikanOnSurfaceVariant
+                    )
                 )
                 NavigationDrawerItem(
                     label = { Text(stringResource(R.string.drawer_settings)) },
@@ -161,7 +162,7 @@ fun DashboardScreen(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     colors = NavigationDrawerItemDefaults.colors(unselectedIconColor = JikanOnSurfaceVariant)
                 )
-                
+
                 Spacer(modifier = Modifier.weight(1f))
                 
                 NavigationDrawerItem(
@@ -185,13 +186,15 @@ fun DashboardScreen(
     ) {
         Scaffold(
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { viewModel.showCreateSheet() },
-                    containerColor = JikanAccent,
-                    contentColor = JikanOnSurface,
-                    shape = MaterialTheme.shapes.extraLarge
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.fab_new_task))
+                if (uiState.currentTab != DashboardTab.STATS) {
+                    FloatingActionButton(
+                        onClick = { viewModel.showCreateSheet() },
+                        containerColor = JikanAccent,
+                        contentColor = JikanSurface,
+                        shape = MaterialTheme.shapes.extraLarge
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.fab_new_task))
+                    }
                 }
             },
             containerColor = JikanSurface
@@ -209,13 +212,24 @@ fun DashboardScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
-                            tint = JikanOnSurface,
-                            modifier = Modifier.size(28.dp)
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu",
+                                tint = JikanOnSurface,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                        if (uiState.currentTab == DashboardTab.STATS) {
+                            Text(
+                                text = "Estatísticas",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = JikanOnSurface,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
                     }
                     IconButton(onClick = { viewModel.toggleTheme() }) {
                         Icon(
@@ -237,6 +251,7 @@ fun DashboardScreen(
                         uiState = uiState,
                         viewModel = viewModel
                     )
+                    DashboardTab.STATS -> StatsContent()
                 }
             }
         }
@@ -248,18 +263,15 @@ fun DashboardScreen(
             task = task,
             onDismiss = { viewModel.selectTask(null) },
             onDelete = { viewModel.deleteTask(it) },
+            onUpdateStatus = { t, s -> viewModel.updateTaskStatus(t, s) },
             onEdit = { viewModel.editTask(it) },
-            onReschedule = { t, newDate -> viewModel.rescheduleTask(t, newDate) },
-            onToggleSubtask = { subtaskId ->
-                viewModel.toggleSubtask(task, subtaskId)
-            }
+            onReschedule = { viewModel.rescheduleTask(it) }
         )
     }
 
-    // ── Criar ou Editar Tarefa ──
+    // ── Criar/Editar Tarefa ──
     if (uiState.showCreateSheet) {
         CreateTaskSheet(
-            initialDate = uiState.selectedDate,
             taskToEdit = uiState.taskToEdit,
             onDismiss = { viewModel.hideCreateSheet() },
             onTaskCreated = { viewModel.onTaskCreated() }
@@ -267,288 +279,232 @@ fun DashboardScreen(
     }
 }
 
-// ═══════════════════════════════════════════
-// ── Aba: Tarefas do Dia ──
-// ═══════════════════════════════════════════
 @Composable
 private fun TasksOfDayContent(
     uiState: DashboardUiState,
     dateFormatter: DateTimeFormatter,
     viewModel: DashboardViewModel
 ) {
-    // ── Header com saudação ──
-    Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-        val greeting = when (uiState.greeting) {
-            "greeting_morning" -> stringResource(R.string.greeting_morning)
-            "greeting_afternoon" -> stringResource(R.string.greeting_afternoon)
-            else -> stringResource(R.string.greeting_evening)
-        }
-
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Date Header
         Text(
-            text = greeting,
-            style = MaterialTheme.typography.headlineSmall,
+            text = uiState.selectedDate.format(dateFormatter),
+            style = MaterialTheme.typography.titleLarge,
+            color = JikanOnSurface,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+        )
+        
+        Text(
+            text = stringResource(uiState.greeting.let { 
+                when(it) {
+                    "greeting_morning" -> R.string.greeting_morning
+                    "greeting_afternoon" -> R.string.greeting_afternoon
+                    else -> R.string.greeting_evening
+                }
+            }),
+            style = MaterialTheme.typography.bodyLarge,
             color = JikanOnSurfaceVariant,
-            fontWeight = FontWeight.Medium
+            modifier = Modifier.padding(horizontal = 24.dp)
         )
 
-        Text(
-            text = uiState.userName,
-            style = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = (-1).sp
-            ),
-            color = JikanOnSurface
-        )
+        Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Today Date Badge
-        Surface(
-            color = JikanAccent.copy(alpha = 0.1f),
-            shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(
-                width = 1.dp,
-                color = JikanAccent.copy(alpha = 0.2f)
-            )
-        ) {
-            Text(
-                text = LocalDate.now().format(dateFormatter)
-                    .replaceFirstChar { it.uppercase() },
-                style = MaterialTheme.typography.labelLarge,
-                color = JikanAccent,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-
-    Spacer(modifier = Modifier.height(20.dp))
-
-    // ── Lista de Tarefas de Hoje ──
-    if (uiState.isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = JikanAccent)
-        }
-    } else if (uiState.tasks.isEmpty()) {
-        Box(
+        // Week Day Selector
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "時",
-                    style = MaterialTheme.typography.headlineLarge.copy(
-                        fontSize = MaterialTheme.typography.headlineLarge.fontSize * 3
-                    ),
-                    color = JikanOnSurfaceVariant.copy(alpha = 0.3f)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = stringResource(R.string.empty_tasks),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = JikanOnSurfaceVariant
+            uiState.weekDays.take(7).forEach { day ->
+                DayItem(
+                    dayItem = day,
+                    onClick = { viewModel.selectDate(day.date) }
                 )
             }
         }
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                start = 16.dp, end = 16.dp,
-                bottom = 88.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(
-                items = uiState.tasks,
-                key = { it.id }
-            ) { task ->
-                TaskCard(
-                    task = task,
-                    onToggleComplete = {
-                        viewModel.toggleTaskComplete(task.id, task.status)
-                    },
-                    onClick = { viewModel.selectTask(task) }
-                )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Tasks List
+        if (uiState.tasks.isEmpty() && !uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 80.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Default.TaskAlt,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = JikanOnSurfaceVariant.copy(alpha = 0.3f)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(R.string.no_tasks),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = JikanOnSurfaceVariant
+                    )
+                }
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(uiState.tasks) { task ->
+                    TaskCard(
+                        task = task,
+                        onClick = { viewModel.selectTask(task) },
+                        onStatusChange = { viewModel.updateTaskStatus(task, it) }
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
     }
 }
 
-// ═══════════════════════════════════════════
-// ── Aba: Calendário com Grid Mensal ──
-// ═══════════════════════════════════════════
 @Composable
 private fun CalendarContent(
     uiState: DashboardUiState,
     viewModel: DashboardViewModel
 ) {
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-    val today = LocalDate.now()
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        // ── Seletor de Mês ──
+    val currentMonth = remember(uiState.selectedDate) { YearMonth.from(uiState.selectedDate) }
+    val daysInMonth = currentMonth.lengthOfMonth()
+    val firstDayOfMonth = currentMonth.atDay(1).dayOfWeek.value % 7
+    
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
-                Icon(
-                    Icons.Default.ChevronLeft,
-                    contentDescription = "Mês anterior",
-                    tint = JikanOnSurface
-                )
-            }
             Text(
-                text = "${currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).replaceFirstChar { it.uppercase() }} ${currentMonth.year}",
+                text = currentMonth.month.getDisplayName(TextStyle.FULL, Locale.getDefault()) + " " + currentMonth.year,
                 style = MaterialTheme.typography.titleLarge,
-                color = JikanOnSurface,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = JikanOnSurface
             )
-            IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
-                Icon(
-                    Icons.Default.ChevronRight,
-                    contentDescription = "Próximo mês",
-                    tint = JikanOnSurface
-                )
+            Row {
+                IconButton(onClick = { viewModel.selectDate(uiState.selectedDate.minusMonths(1)) }) {
+                    Icon(Icons.Default.ChevronLeft, contentDescription = "Anterior", tint = JikanOnSurface)
+                }
+                IconButton(onClick = { viewModel.selectDate(uiState.selectedDate.plusMonths(1)) }) {
+                    Icon(Icons.Default.ChevronRight, contentDescription = "Próximo", tint = JikanOnSurface)
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // ── Cabeçalho dos dias da semana ──
-        val weekDayNames = listOf("Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom")
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            weekDayNames.forEach { day ->
+        // Weekday labels
+        Row(modifier = Modifier.fillMaxWidth()) {
+            listOf("Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb").forEach {
                 Text(
-                    text = day,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = JikanOnSurfaceVariant,
+                    text = it,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold
+                    style = MaterialTheme.typography.labelMedium,
+                    color = JikanOnSurfaceVariant
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ── Grid do Calendário ──
-        val firstDayOfMonth = currentMonth.atDay(1)
-        // Monday = 1, ..., Sunday = 7
-        val startDayOfWeek = firstDayOfMonth.dayOfWeek.value
-        val daysInMonth = currentMonth.lengthOfMonth()
-        
-        // Build cells: empty cells for padding + actual day cells
-        val emptyCells = startDayOfWeek - 1 // Monday-based
-        val totalCells = emptyCells + daysInMonth
-
+        // Calendar Grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            modifier = Modifier.weight(1f)
         ) {
-            // Empty cells for alignment
-            items(emptyCells) {
-                Box(modifier = Modifier.aspectRatio(1f))
-            }
-            // Day cells
-            items(daysInMonth) { index ->
-                val day = index + 1
-                val date = currentMonth.atDay(day)
-                val isToday = date == today
+            // Empty spaces for first week
+            items(firstDayOfMonth) { Spacer(modifier = Modifier.aspectRatio(1f)) }
+            
+            items(daysInMonth) { dayIndex ->
+                val date = currentMonth.atDay(dayIndex + 1)
                 val isSelected = date == uiState.selectedDate
-
-                val bgColor = when {
-                    isSelected -> JikanAccent
-                    isToday -> JikanAccent.copy(alpha = 0.1f)
-                    else -> Color.Transparent
-                }
-                val borderColor = when {
-                    isSelected -> JikanAccent
-                    isToday -> JikanAccent.copy(alpha = 0.3f)
-                    else -> if (LocalIsDarkTheme.current) Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
-                }
-                val textColor = when {
-                    isSelected -> JikanSurface
-                    isToday -> JikanAccent
-                    else -> JikanOnSurface
-                }
-
-                Surface(
+                val isToday = date == LocalDate.now()
+                
+                Box(
                     modifier = Modifier
                         .aspectRatio(1f)
+                        .padding(4.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable {
-                            viewModel.selectDate(date)
-                        },
-                    color = bgColor,
-                    shape = RoundedCornerShape(12.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
-                    tonalElevation = 0.dp
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = day.toString(),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = textColor,
-                            fontWeight = if (isToday || isSelected) FontWeight.Bold else FontWeight.Normal
+                        .background(
+                            when {
+                                isSelected -> JikanAccent
+                                isToday -> JikanAccent.copy(alpha = 0.1f)
+                                else -> Color.Transparent
+                            }
                         )
-                    }
-                }
-            }
-        }
-
-        // ── Tarefas do dia selecionado (abaixo do calendário) ──
-        if (uiState.tasks.isNotEmpty()) {
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-                color = JikanOnSurfaceVariant.copy(alpha = 0.1f)
-            )
-            Text(
-                text = "Tarefas em ${uiState.selectedDate.dayOfMonth}/${uiState.selectedDate.monthValue}",
-                style = MaterialTheme.typography.titleSmall,
-                color = JikanOnSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
-            )
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(
-                    start = 16.dp, end = 16.dp, bottom = 88.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    items = uiState.tasks,
-                    key = { it.id }
-                ) { task ->
-                    TaskCard(
-                        task = task,
-                        onToggleComplete = {
-                            viewModel.toggleTaskComplete(task.id, task.status)
-                        },
-                        onClick = { viewModel.selectTask(task) }
+                        .clickable { viewModel.selectDate(date) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = (dayIndex + 1).toString(),
+                        color = if (isSelected) JikanSurface else JikanOnSurface,
+                        fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal
                     )
                 }
             }
         }
+
+        // Mini list for selected day in calendar
+        if (uiState.tasks.isNotEmpty()) {
+            Text(
+                text = "Tarefas de " + uiState.selectedDate.dayOfMonth,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = JikanOnSurface,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.heightIn(max = 300.dp)
+            ) {
+                items(uiState.tasks) { task ->
+                    TaskCard(
+                        task = task,
+                        onClick = { viewModel.selectTask(task) },
+                        onStatusChange = { viewModel.updateTaskStatus(task, it) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DayItem(
+    dayItem: DayItem,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (dayItem.isSelected) JikanAccent else Color.Transparent)
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp, horizontal = 8.dp)
+            .width(44.dp)
+    ) {
+        Text(
+            text = dayItem.dayOfWeek,
+            style = MaterialTheme.typography.labelMedium,
+            color = if (dayItem.isSelected) JikanSurface else JikanOnSurfaceVariant,
+            fontWeight = FontWeight.Medium
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = dayItem.dayNumber.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            color = if (dayItem.isSelected) JikanSurface else JikanOnSurface,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
