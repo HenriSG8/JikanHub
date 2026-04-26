@@ -17,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateTaskViewModel @Inject constructor(
     private val createTaskUseCase: CreateTaskUseCase,
+    private val updateTaskUseCase: com.jikanhub.app.domain.usecase.UpdateTaskUseCase,
     private val api: JikanHubApi
 ) : ViewModel() {
 
@@ -25,6 +26,27 @@ class CreateTaskViewModel @Inject constructor(
 
     private val _taskCreated = MutableSharedFlow<Unit>()
     val taskCreated: SharedFlow<Unit> = _taskCreated.asSharedFlow()
+
+    private var editingTaskId: String? = null
+
+    fun loadTaskForEdit(task: Task) {
+        editingTaskId = task.id
+        _uiState.update { 
+            it.copy(
+                title = task.title,
+                description = task.description,
+                date = task.dateTime.toLocalDate(),
+                time = task.dateTime.toLocalTime(),
+                priority = task.priority,
+                reminderEnabled = task.reminder.enabled,
+                reminderMessage = task.reminder.message,
+                selectedOffsets = task.reminder.offsets.toSet(),
+                subtasks = task.subtasks.map { sub -> 
+                    SubtaskDraft(id = sub.id, title = sub.title, isCompleted = sub.isCompleted) 
+                }
+            )
+        }
+    }
 
     fun updateTitle(title: String) {
         _uiState.update { it.copy(title = title) }
@@ -147,6 +169,7 @@ class CreateTaskViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true, error = null) }
             try {
                 val task = Task(
+                    id = editingTaskId ?: "",
                     title = state.title.trim(),
                     description = state.description.trim(),
                     dateTime = LocalDateTime.of(state.date, state.time),
@@ -160,10 +183,17 @@ class CreateTaskViewModel @Inject constructor(
                     ),
                     subtasks = state.subtasks
                         .filter { it.title.isNotBlank() }
-                        .map { Subtask(id = it.id, title = it.title.trim(), isCompleted = false) }
+                        .map { Subtask(id = it.id, title = it.title.trim(), isCompleted = it.isCompleted) }
                 )
-                createTaskUseCase(task)
+                
+                if (editingTaskId != null) {
+                    updateTaskUseCase(task)
+                } else {
+                    createTaskUseCase(task)
+                }
+                
                 _uiState.value = CreateTaskUiState() // Reseta o estado (limpa os campos)
+                editingTaskId = null
                 _taskCreated.emit(Unit)
             } catch (e: Exception) {
                 _uiState.update {

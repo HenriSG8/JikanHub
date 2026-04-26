@@ -15,7 +15,8 @@ data class TaskDto(
     val reminderOffsets: List<Int> = emptyList(),
     val subtasks: List<SubtaskDto> = emptyList(),
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    val isDeleted: Boolean = false
 )
 
 @Serializable

@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.RemoveCircle
 @Composable
 fun CreateTaskSheet(
     initialDate: java.time.LocalDate = java.time.LocalDate.now(),
+    taskToEdit: com.jikanhub.app.domain.model.Task? = null,
     onDismiss: () -> Unit,
     onTaskCreated: () -> Unit,
     viewModel: CreateTaskViewModel = hiltViewModel()
@@ -32,8 +33,12 @@ fun CreateTaskSheet(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    LaunchedEffect(initialDate) {
-        viewModel.updateDate(initialDate)
+    LaunchedEffect(initialDate, taskToEdit) {
+        if (taskToEdit != null) {
+            viewModel.loadTaskForEdit(taskToEdit)
+        } else {
+            viewModel.updateDate(initialDate)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -64,7 +69,7 @@ fun CreateTaskSheet(
         ) {
             // Title
             Text(
-                text = stringResource(R.string.fab_new_task),
+                text = if (taskToEdit != null) "Editar Tarefa" else stringResource(R.string.fab_new_task),
                 style = MaterialTheme.typography.headlineMedium,
                 color = JikanOnSurface
             )
@@ -79,8 +84,10 @@ fun CreateTaskSheet(
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = JikanAccent,
-                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = JikanAccent
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                    cursorColor = JikanAccent,
+                    focusedLabelColor = JikanAccent,
+                    unfocusedLabelColor = JikanOnSurfaceVariant
                 )
             )
 
@@ -94,8 +101,10 @@ fun CreateTaskSheet(
                 maxLines = 4,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = JikanAccent,
-                    unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
-                    cursorColor = JikanAccent
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                    cursorColor = JikanAccent,
+                    focusedLabelColor = JikanAccent,
+                    unfocusedLabelColor = JikanOnSurfaceVariant
                 )
             )
 
@@ -172,7 +181,7 @@ fun CreateTaskSheet(
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = JikanAccent,
-                        unfocusedBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.2f),
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                         cursorColor = JikanAccent
                     ),
                     singleLine = true
@@ -206,7 +215,7 @@ fun CreateTaskSheet(
                         },
                     enabled = false, // Use enabled=false + clickable modifier for text fields to act as buttons
                     colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                         disabledTextColor = JikanOnSurface,
                         disabledLabelColor = JikanOnSurfaceVariant
                     )
@@ -231,7 +240,7 @@ fun CreateTaskSheet(
                         },
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
-                        disabledBorderColor = JikanOnSurfaceVariant.copy(alpha = 0.3f),
+                        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                         disabledTextColor = JikanOnSurface,
                         disabledLabelColor = JikanOnSurfaceVariant
                     )
@@ -358,7 +367,7 @@ fun CreateTaskSheet(
                     )
                 } else {
                     Text(
-                        text = stringResource(R.string.btn_save),
+                        text = if (taskToEdit != null) "Salvar Alterações" else stringResource(R.string.btn_save),
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
@@ -375,21 +384,37 @@ private fun PriorityChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = { Text(label) },
-        modifier = modifier,
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = color.copy(alpha = 0.2f),
-            selectedLabelColor = color,
-            labelColor = JikanOnSurfaceVariant
-        ),
-        border = FilterChipDefaults.filterChipBorder(
-            borderColor = color.copy(alpha = 0.3f),
-            selectedBorderColor = color,
-            enabled = true,
-            selected = selected
-        )
+    val backgroundColor by animateColorAsState(
+        targetValue = if (selected) color.copy(alpha = 0.15f) else JikanSurfaceVariant.copy(alpha = 0.5f),
+        label = "bg"
     )
+    val contentColor by animateColorAsState(
+        targetValue = if (selected) color else JikanOnSurfaceVariant,
+        label = "content"
+    )
+    val borderColor by animateColorAsState(
+        targetValue = if (selected) color.copy(alpha = 0.5f) else androidx.compose.ui.graphics.Color.Transparent,
+        label = "border"
+    )
+
+    Surface(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onClick() },
+        color = backgroundColor,
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+    ) {
+        Box(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelLarge,
+                color = contentColor,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+            )
+        }
+    }
 }

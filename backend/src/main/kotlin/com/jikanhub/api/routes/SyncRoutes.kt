@@ -45,6 +45,7 @@ fun Route.syncRoutes() {
                                     it[reminderMessage] = dto.reminderMessage
                                     it[reminderOffsets] = dto.reminderOffsets.joinToString(",")
                                     it[updatedAt] = clientUpdated
+                                    it[isDeleted] = dto.isDeleted
                                 }
 
                                 // Update subtasks
@@ -73,6 +74,7 @@ fun Route.syncRoutes() {
                                 it[reminderOffsets] = dto.reminderOffsets.joinToString(",")
                                 it[createdAt] = LocalDateTime.now()
                                 it[updatedAt] = LocalDateTime.parse(dto.updatedAt)
+                                it[isDeleted] = dto.isDeleted
                             }
 
                             // Insert subtasks

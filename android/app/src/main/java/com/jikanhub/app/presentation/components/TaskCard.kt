@@ -43,12 +43,17 @@ fun TaskCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = JikanSurfaceVariant.copy(alpha = cardAlpha)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        border = if (LocalIsDarkTheme.current) null else androidx.compose.foundation.BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier

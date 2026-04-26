@@ -23,5 +23,6 @@ data class CreateTaskUiState(
 
 data class SubtaskDraft(
     val id: String = java.util.UUID.randomUUID().toString(),
-    val title: String = ""
+    val title: String = "",
+    val isCompleted: Boolean = false
 )

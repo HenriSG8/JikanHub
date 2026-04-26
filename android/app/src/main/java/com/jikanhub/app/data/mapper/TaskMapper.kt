@@ -75,7 +75,8 @@ fun TaskEntity.toDto(): TaskDto {
         createdAt = java.time.Instant.ofEpochMilli(createdAt)
             .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().toString(),
         updatedAt = java.time.Instant.ofEpochMilli(updatedAt)
-            .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().toString()
+            .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime().toString(),
+        isDeleted = isDeleted
     )
 }
 
@@ -96,6 +97,7 @@ fun TaskDto.toEntity(): TaskEntity {
         updatedAt = java.time.LocalDateTime.parse(updatedAt)
             .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli(),
         isSynced = true,
+        isDeleted = isDeleted,
         subtasksJson = Json.encodeToString(subtasks.map { it.toDomain() })
     )
 }

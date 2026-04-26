@@ -61,17 +61,24 @@ fun DashboardScreen(
                 Spacer(modifier = Modifier.height(24.dp))
                 
                 // Drawer Header
-                Column(modifier = Modifier.padding(horizontal = 28.dp, vertical = 24.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(JikanAccent.copy(alpha = 0.05f))
+                        .padding(horizontal = 28.dp, vertical = 32.dp)
+                ) {
                     Surface(
-                        modifier = Modifier.size(64.dp),
-                        shape = CircleShape,
-                        color = JikanAccent.copy(alpha = 0.2f)
+                        modifier = Modifier.size(72.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        color = JikanAccent,
+                        tonalElevation = 4.dp
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
                                 text = uiState.userName.firstOrNull()?.uppercase() ?: "U",
-                                style = MaterialTheme.typography.headlineLarge,
-                                color = JikanAccent
+                                style = MaterialTheme.typography.displaySmall,
+                                color = JikanSurface,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
@@ -80,12 +87,13 @@ fun DashboardScreen(
                         text = uiState.userName,
                         style = MaterialTheme.typography.titleLarge,
                         color = JikanOnSurface,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.ExtraBold
                     )
                     Text(
                         text = "JikanHub Premium",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = JikanOnSurfaceVariant
+                        style = MaterialTheme.typography.labelMedium,
+                        color = JikanAccent,
+                        fontWeight = FontWeight.Bold
                     )
                 }
 
@@ -222,16 +230,18 @@ fun DashboardScreen(
             task = task,
             onDismiss = { viewModel.selectTask(null) },
             onDelete = { viewModel.deleteTask(it) },
+            onEdit = { viewModel.editTask(it) },
             onToggleSubtask = { subtaskId ->
                 viewModel.toggleSubtask(task, subtaskId)
             }
         )
     }
 
-    // ── Criar Tarefa ──
+    // ── Criar ou Editar Tarefa ──
     if (uiState.showCreateSheet) {
         CreateTaskSheet(
             initialDate = uiState.selectedDate,
+            taskToEdit = uiState.taskToEdit,
             onDismiss = { viewModel.hideCreateSheet() },
             onTaskCreated = { viewModel.onTaskCreated() }
         )
@@ -264,28 +274,31 @@ private fun TasksOfDayContent(
 
         Text(
             text = uiState.userName,
-            style = MaterialTheme.typography.headlineLarge.copy(
-                fontSize = 32.sp,
-                letterSpacing = (-0.5).sp
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = (-1).sp
             ),
-            color = JikanOnSurface,
-            fontWeight = FontWeight.Bold
+            color = JikanOnSurface
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Card de data de hoje
+        // Today Date Badge
         Surface(
-            color = JikanSurfaceBright.copy(alpha = 0.5f),
-            shape = RoundedCornerShape(12.dp)
+            color = JikanAccent.copy(alpha = 0.1f),
+            shape = RoundedCornerShape(8.dp),
+            border = androidx.compose.foundation.BorderStroke(
+                width = 1.dp,
+                color = JikanAccent.copy(alpha = 0.2f)
+            )
         ) {
             Text(
                 text = LocalDate.now().format(dateFormatter)
                     .replaceFirstChar { it.uppercase() },
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelLarge,
                 color = JikanAccent,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                fontWeight = FontWeight.Medium
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -447,8 +460,13 @@ private fun CalendarContent(
 
                 val bgColor = when {
                     isSelected -> JikanAccent
-                    isToday -> JikanAccent.copy(alpha = 0.15f)
-                    else -> JikanSurfaceBright.copy(alpha = 0.3f)
+                    isToday -> JikanAccent.copy(alpha = 0.1f)
+                    else -> androidx.compose.ui.graphics.Color.Transparent
+                }
+                val borderColor = when {
+                    isSelected -> JikanAccent
+                    isToday -> JikanAccent.copy(alpha = 0.3f)
+                    else -> if (LocalIsDarkTheme.current) androidx.compose.ui.graphics.Color.Transparent else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
                 }
                 val textColor = when {
                     isSelected -> JikanSurface
@@ -465,7 +483,8 @@ private fun CalendarContent(
                         },
                     color = bgColor,
                     shape = RoundedCornerShape(12.dp),
-                    tonalElevation = if (isSelected) 4.dp else 0.dp
+                    border = androidx.compose.foundation.BorderStroke(1.dp, borderColor),
+                    tonalElevation = 0.dp
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(

@@ -13,7 +13,8 @@ data class DashboardUiState(
     val weekDays: List<DayItem> = emptyList(),
     val showCreateSheet: Boolean = false,
     val selectedTask: Task? = null,
-    val isDarkMode: Boolean = true
+    val isDarkMode: Boolean = true,
+    val taskToEdit: Task? = null
 )
 
 data class DayItem(

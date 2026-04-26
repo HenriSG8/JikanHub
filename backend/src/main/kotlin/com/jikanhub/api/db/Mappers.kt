@@ -36,6 +36,7 @@ fun ResultRow.toTaskDto(): TaskDto {
         reminderOffsets = offsets,
         subtasks = subtasks,
         createdAt = this[Tasks.createdAt].toString(),
-        updatedAt = this[Tasks.updatedAt].toString()
+        updatedAt = this[Tasks.updatedAt].toString(),
+        isDeleted = this[Tasks.isDeleted]
     )
 }

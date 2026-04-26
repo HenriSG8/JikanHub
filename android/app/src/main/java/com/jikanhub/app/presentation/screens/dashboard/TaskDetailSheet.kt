@@ -20,6 +20,7 @@ fun TaskDetailSheet(
     task: Task,
     onDismiss: () -> Unit,
     onDelete: (String) -> Unit,
+    onEdit: (Task) -> Unit,
     onToggleSubtask: (String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -59,13 +60,28 @@ fun TaskDetailSheet(
                 )
             }
 
-            // Title
-            Text(
-                text = task.title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = JikanOnSurface,
-                fontWeight = FontWeight.Bold
-            )
+            // Title and Edit button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = task.title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = JikanOnSurface,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                IconButton(onClick = { onEdit(task) }) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Edit,
+                        contentDescription = "Editar",
+                        tint = JikanAccent
+                    )
+                }
+            }
 
             // Date
             Text(

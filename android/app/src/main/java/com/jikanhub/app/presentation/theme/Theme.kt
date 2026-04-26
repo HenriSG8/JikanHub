@@ -40,6 +40,7 @@ private val LightColorScheme = lightColorScheme(
     onBackground = LightOnSurface,
     onSurface = LightOnSurface,
     onSurfaceVariant = LightOnSurfaceVariant,
+    outline = LightOutline,
     error = LightPriorityHigh
 )
 

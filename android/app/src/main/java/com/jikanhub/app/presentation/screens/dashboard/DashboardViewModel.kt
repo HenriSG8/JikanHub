@@ -141,11 +141,19 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun showCreateSheet() {
-        _uiState.update { it.copy(showCreateSheet = true) }
+        _uiState.update { it.copy(showCreateSheet = true, taskToEdit = null) }
+    }
+
+    fun editTask(task: com.jikanhub.app.domain.model.Task) {
+        _uiState.update { it.copy(taskToEdit = task, showCreateSheet = true, selectedTask = null) }
+    }
+
+    fun clearTaskToEdit() {
+        _uiState.update { it.copy(taskToEdit = null) }
     }
 
     fun hideCreateSheet() {
-        _uiState.update { it.copy(showCreateSheet = false) }
+        _uiState.update { it.copy(showCreateSheet = false, taskToEdit = null) }
     }
 
     fun onTaskCreated() {
