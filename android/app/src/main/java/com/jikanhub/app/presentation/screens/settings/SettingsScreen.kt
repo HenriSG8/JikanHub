@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jikanhub.app.R
+import com.jikanhub.app.presentation.theme.JikanAccent
 import com.jikanhub.app.presentation.theme.JikanOnSurface
 import com.jikanhub.app.presentation.theme.JikanOnSurfaceVariant
 import com.jikanhub.app.presentation.theme.JikanSurface
