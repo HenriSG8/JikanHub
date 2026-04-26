@@ -50,7 +50,16 @@ fun JikanNavHost(
                     navController.navigate("login") {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onNavigateToSettings = {
+                    navController.navigate("settings")
                 }
+            )
+        }
+
+        composable("settings") {
+            com.jikanhub.app.presentation.screens.settings.SettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

@@ -1,7 +1,9 @@
 package com.jikanhub.app.presentation.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -49,7 +51,7 @@ fun TaskCard(
         colors = CardDefaults.cardColors(
             containerColor = JikanSurfaceVariant.copy(alpha = cardAlpha)
         ),
-        border = if (LocalIsDarkTheme.current) null else androidx.compose.foundation.BorderStroke(
+        border = if (LocalIsDarkTheme.current) null else BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
         ),

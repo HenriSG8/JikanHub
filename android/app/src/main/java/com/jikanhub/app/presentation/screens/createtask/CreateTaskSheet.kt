@@ -1,15 +1,22 @@
 package com.jikanhub.app.presentation.screens.createtask
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -393,7 +400,7 @@ private fun PriorityChip(
         label = "content"
     )
     val borderColor by animateColorAsState(
-        targetValue = if (selected) color.copy(alpha = 0.5f) else androidx.compose.ui.graphics.Color.Transparent,
+        targetValue = if (selected) color.copy(alpha = 0.5f) else Color.Transparent,
         label = "border"
     )
 
@@ -403,7 +410,7 @@ private fun PriorityChip(
             .clickable { onClick() },
         color = backgroundColor,
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+        border = BorderStroke(1.dp, borderColor)
     ) {
         Box(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

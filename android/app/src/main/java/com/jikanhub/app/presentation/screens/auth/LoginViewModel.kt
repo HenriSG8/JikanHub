@@ -32,7 +32,13 @@ class LoginViewModel @Inject constructor(
             result.onSuccess {
                 _uiState.update { it.copy(isLoading = false, isSuccess = true) }
             }.onFailure { e ->
-                _uiState.update { it.copy(isLoading = false, error = e.message ?: "Erro ao fazer login") }
+                val errorMessage = when {
+                    e.message?.contains("401") == true -> "E-mail ou senha incorretos"
+                    e.message?.contains("404") == true -> "Usuário não encontrado"
+                    e.message?.contains("500") == true -> "Erro no servidor, tente mais tarde"
+                    else -> "Erro ao fazer login. Verifique sua conexão."
+                }
+                _uiState.update { it.copy(isLoading = false, error = errorMessage) }
             }
         }
     }
