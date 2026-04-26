@@ -18,45 +18,32 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-// Gemini API response models
+// Groq API response models (OpenAI compatible)
 @Serializable
-data class GeminiRequest(
-    val contents: List<GeminiContent>,
-    val generationConfig: GeminiGenerationConfig = GeminiGenerationConfig()
-)
-
-@Serializable
-data class GeminiContent(
-    val parts: List<GeminiPart>
-)
-
-@Serializable
-data class GeminiPart(
-    val text: String
-)
-
-@Serializable
-data class GeminiGenerationConfig(
+data class GroqRequest(
+    val model: String = "llama3-70b-8192",
+    val messages: List<GroqMessage>,
     val temperature: Double = 0.7,
-    val maxOutputTokens: Int = 512
+    val max_tokens: Int = 512
 )
 
 @Serializable
-data class GeminiResponse(
-    val candidates: List<GeminiCandidate>? = null
+data class GroqMessage(
+    val role: String,
+    val content: String
 )
 
 @Serializable
-data class GeminiCandidate(
-    val content: GeminiCandidateContent? = null
+data class GroqResponse(
+    val choices: List<GroqChoice>? = null
 )
 
 @Serializable
-data class GeminiCandidateContent(
-    val parts: List<GeminiPart>? = null
+data class GroqChoice(
+    val message: GroqMessage? = null
 )
 
-private val geminiClient = HttpClient(CIO) {
+private val aiClient = HttpClient(CIO) {
     install(ContentNegotiation) {
         json(Json {
             ignoreUnknownKeys = true
@@ -71,7 +58,7 @@ fun Route.aiRoutes() {
 
             // POST /api/ai/suggest-subtasks
             post("/suggest-subtasks") {
-                val apiKey = System.getenv("GEMINI_API_KEY")
+                val apiKey = System.getenv("GROQ_API_KEY")
                 if (apiKey.isNullOrBlank()) {
                     call.respond(
                         HttpStatusCode.ServiceUnavailable,
@@ -93,38 +80,33 @@ fun Route.aiRoutes() {
                 try {
                     val prompt = buildPrompt(request.title, request.description)
 
-                    val geminiResponse = geminiClient.post(
-                        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey"
-                    ) {
+                    val aiResponse = aiClient.post("https://api.groq.com/openai/v1/chat/completions") {
                         contentType(ContentType.Application.Json)
-                        setBody(GeminiRequest(
-                            contents = listOf(
-                                GeminiContent(
-                                    parts = listOf(GeminiPart(text = prompt))
-                                )
+                        header("Authorization", "Bearer $apiKey")
+                        setBody(GroqRequest(
+                            messages = listOf(
+                                GroqMessage(role = "user", content = prompt)
                             )
                         ))
                     }
 
-                    if (!geminiResponse.status.isSuccess()) {
-                        val errorBody = geminiResponse.bodyAsText()
-                        throw Exception("Gemini Error ${geminiResponse.status.value}: $errorBody")
+                    if (!aiResponse.status.isSuccess()) {
+                        val errorBody = aiResponse.bodyAsText()
+                        throw Exception("Groq Error ${aiResponse.status.value}: $errorBody")
                     }
 
-                    val body = geminiResponse.body<GeminiResponse>()
-                    val rawText = body.candidates
+                    val body = aiResponse.body<GroqResponse>()
+                    val rawText = body.choices
                         ?.firstOrNull()
-                        ?.content
-                        ?.parts
-                        ?.firstOrNull()
-                        ?.text ?: ""
+                        ?.message
+                        ?.content ?: ""
 
                     val subtasks = parseSubtasks(rawText)
 
                     call.respond(AiSuggestResponse(subtasks = subtasks))
 
                 } catch (e: Exception) {
-                    System.err.println("Gemini API error: ${e.message}")
+                    System.err.println("Groq API error: ${e.message}")
                     e.printStackTrace()
                     call.respond(
                         HttpStatusCode.InternalServerError,
