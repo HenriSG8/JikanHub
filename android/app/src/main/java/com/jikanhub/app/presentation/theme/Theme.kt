@@ -11,7 +11,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-val LocalIsDarkTheme = staticCompositionLocalOf { true }
+enum class AppTheme {
+    LIGHT, DARK, VITORIA, BAHIA
+}
+
+val LocalAppTheme = staticCompositionLocalOf { AppTheme.DARK }
 
 private val DarkColorScheme = darkColorScheme(
     primary = DarkAccent,
@@ -44,12 +48,49 @@ private val LightColorScheme = lightColorScheme(
     error = LightPriorityHigh
 )
 
+private val VitoriaColorScheme = darkColorScheme(
+    primary = VitoriaAccent,
+    onPrimary = VitoriaOnSurface,
+    secondary = DarkPriorityLow,
+    tertiary = DarkPriorityMedium,
+    background = VitoriaSurface,
+    surface = VitoriaSurface,
+    surfaceVariant = VitoriaSurfaceVariant,
+    surfaceContainer = VitoriaSurfaceContainer,
+    onBackground = VitoriaOnSurface,
+    onSurface = VitoriaOnSurface,
+    onSurfaceVariant = VitoriaOnSurfaceVariant,
+    error = DarkPriorityHigh
+)
+
+private val BahiaColorScheme = darkColorScheme(
+    primary = BahiaAccent,
+    onPrimary = BahiaOnSurface,
+    secondary = DarkPriorityLow,
+    tertiary = DarkPriorityMedium,
+    background = BahiaSurface,
+    surface = BahiaSurface,
+    surfaceVariant = BahiaSurfaceVariant,
+    surfaceContainer = BahiaSurfaceContainer,
+    onBackground = BahiaOnSurface,
+    onSurface = BahiaOnSurface,
+    onSurfaceVariant = BahiaOnSurfaceVariant,
+    error = DarkPriorityHigh
+)
+
 @Composable
 fun JikanHubTheme(
-    darkTheme: Boolean = true, // Dark is default — Japanese aesthetic
+    theme: AppTheme = AppTheme.DARK,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = when (theme) {
+        AppTheme.LIGHT -> LightColorScheme
+        AppTheme.DARK -> DarkColorScheme
+        AppTheme.VITORIA -> VitoriaColorScheme
+        AppTheme.BAHIA -> BahiaColorScheme
+    }
+
+    val isLightStatusBar = theme == AppTheme.LIGHT
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -58,13 +99,13 @@ fun JikanHubTheme(
             window.statusBarColor = colorScheme.surface.toArgb()
             window.navigationBarColor = colorScheme.surfaceContainer.toArgb()
             WindowCompat.getInsetsController(window, view).apply {
-                isAppearanceLightStatusBars = !darkTheme
-                isAppearanceLightNavigationBars = !darkTheme
+                isAppearanceLightStatusBars = isLightStatusBar
+                isAppearanceLightNavigationBars = isLightStatusBar
             }
         }
     }
 
-    CompositionLocalProvider(LocalIsDarkTheme provides darkTheme) {
+    CompositionLocalProvider(LocalAppTheme provides theme) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = JikanTypography,

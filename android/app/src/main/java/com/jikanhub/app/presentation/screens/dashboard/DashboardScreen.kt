@@ -94,11 +94,25 @@ fun DashboardScreen(
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    var tapCount by remember { mutableStateOf(0) }
+                    
                     Text(
                         text = uiState.userName,
                         style = MaterialTheme.typography.titleLarge,
                         color = JikanOnSurface,
-                        fontWeight = FontWeight.ExtraBold
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.clickable(
+                            indication = null,
+                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+                        ) {
+                            tapCount++
+                            if (tapCount == 5) {
+                                viewModel.unlockEasterEgg()
+                                android.widget.Toast.makeText(context, "🎉 Você desbloqueou os temas secretos da dupla Ba-Vi!", android.widget.Toast.LENGTH_LONG).show()
+                                tapCount = 0
+                            }
+                        }
                     )
                     Text(
                         text = "JikanHub Premium",
@@ -269,7 +283,7 @@ fun DashboardScreen(
                     }
                     IconButton(onClick = { viewModel.toggleTheme() }) {
                         Icon(
-                            imageVector = if (uiState.isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            imageVector = if (uiState.appTheme != "LIGHT") Icons.Default.LightMode else Icons.Default.DarkMode,
                             contentDescription = "Alternar Tema",
                             tint = JikanOnSurfaceVariant
                         )

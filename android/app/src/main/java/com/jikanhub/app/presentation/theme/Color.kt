@@ -39,6 +39,26 @@ val LightAccentVariant = Color(0xFF5C7CFA)
 val Completed = Color(0xFF4A9E7A)          
 val Postponed = Color(0xFF9E7A4A)          
 
+// Raw Vitoria colors
+val VitoriaSurface = Color(0xFF121212)
+val VitoriaSurfaceVariant = Color(0xFF1E1E1E)
+val VitoriaSurfaceContainer = Color(0xFF000000)
+val VitoriaSurfaceBright = Color(0xFF2C2C2C)
+val VitoriaOnSurface = Color(0xFFFFFFFF)
+val VitoriaOnSurfaceVariant = Color(0xFFB3B3B3)
+val VitoriaAccent = Color(0xFFD32F2F)
+val VitoriaAccentVariant = Color(0xFFB71C1C)
+
+// Raw Bahia colors
+val BahiaSurface = Color(0xFF003366)
+val BahiaSurfaceVariant = Color(0xFF004080)
+val BahiaSurfaceContainer = Color(0xFF002244)
+val BahiaSurfaceBright = Color(0xFF0059B3)
+val BahiaOnSurface = Color(0xFFFFFFFF)
+val BahiaOnSurfaceVariant = Color(0xFFB3D9FF)
+val BahiaAccent = Color(0xFFD32F2F) // Red accent
+val BahiaAccentVariant = Color(0xFFFFFFFF) // White accent variant
+
 // Dynamic Color Proxies (Resolve to active theme)
 val JikanSurface: Color
     @Composable get() = MaterialTheme.colorScheme.surface
@@ -50,7 +70,12 @@ val JikanSurfaceContainer: Color
     @Composable get() = MaterialTheme.colorScheme.surfaceContainer
 
 val JikanSurfaceBright: Color
-    @Composable get() = if (LocalIsDarkTheme.current) DarkSurfaceBright else LightSurfaceBright
+    @Composable get() = when (LocalAppTheme.current) {
+        AppTheme.LIGHT -> LightSurfaceBright
+        AppTheme.DARK -> DarkSurfaceBright
+        AppTheme.VITORIA -> VitoriaSurfaceBright
+        AppTheme.BAHIA -> BahiaSurfaceBright
+    }
 
 val JikanOnSurface: Color
     @Composable get() = MaterialTheme.colorScheme.onSurface
@@ -71,4 +96,9 @@ val JikanAccent: Color
     @Composable get() = MaterialTheme.colorScheme.primary
 
 val JikanAccentVariant: Color
-    @Composable get() = if (LocalIsDarkTheme.current) DarkAccentVariant else LightAccentVariant
+    @Composable get() = when (LocalAppTheme.current) {
+        AppTheme.LIGHT -> LightAccentVariant
+        AppTheme.DARK -> DarkAccentVariant
+        AppTheme.VITORIA -> VitoriaAccentVariant
+        AppTheme.BAHIA -> BahiaAccentVariant
+    }

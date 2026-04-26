@@ -26,6 +26,18 @@ class SettingsViewModel @Inject constructor(
     private val _isDeleting = MutableStateFlow(false)
     val isDeleting = _isDeleting.asStateFlow()
 
+    val appTheme: StateFlow<String> = tokenManager.appTheme
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "DARK")
+
+    val isEasterEggUnlocked: StateFlow<Boolean> = tokenManager.isEasterEggUnlocked
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    fun setAppTheme(theme: String) {
+        viewModelScope.launch {
+            tokenManager.setAppTheme(theme)
+        }
+    }
+
     val notificationSoundUri: StateFlow<String?> = tokenManager.notificationSoundUri
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 

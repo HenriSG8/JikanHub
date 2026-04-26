@@ -72,6 +72,18 @@ fun SettingsScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // Theme Selection
+                Text(
+                    text = "Aparência",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JikanOnSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                ThemeOptionsSection(viewModel = hiltViewModel())
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = stringResource(R.string.settings_language),
                     style = MaterialTheme.typography.titleMedium,
@@ -250,6 +262,75 @@ private fun SoundPickerItem(
     }
 }
 
+@Composable
+private fun ThemeOptionsSection(viewModel: SettingsViewModel) {
+    val currentTheme by viewModel.appTheme.collectAsState()
+    val isEasterEggUnlocked by viewModel.isEasterEggUnlocked.collectAsState()
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        ThemeItem(
+            label = "Modo Claro",
+            selected = currentTheme == "LIGHT",
+            onClick = { viewModel.setAppTheme("LIGHT") }
+        )
+        ThemeItem(
+            label = "Modo Escuro (Padrão)",
+            selected = currentTheme == "DARK",
+            onClick = { viewModel.setAppTheme("DARK") }
+        )
+
+        if (isEasterEggUnlocked) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "✨ Temas Secretos",
+                style = MaterialTheme.typography.titleSmall,
+                color = JikanAccent,
+                fontWeight = FontWeight.Bold
+            )
+            ThemeItem(
+                label = "Vitória (Rubro-Negro)",
+                selected = currentTheme == "VITORIA",
+                onClick = { viewModel.setAppTheme("VITORIA") }
+            )
+            ThemeItem(
+                label = "Bahia (Esquadrão)",
+                selected = currentTheme == "BAHIA",
+                onClick = { viewModel.setAppTheme("BAHIA") }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ThemeItem(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        color = if (selected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else JikanSurface,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                color = JikanOnSurface
+            )
+            if (selected) {
+                RadioButton(selected = true, onClick = null)
+            }
+        }
+    }
+}
 
 @Composable
 private fun LanguageItem(

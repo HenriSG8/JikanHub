@@ -54,7 +54,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isLoggedIn(): Boolean {
-        return tokenManager.getToken() != null
+        return tokenManager.token.first() != null
     }
 
     override suspend fun deleteAccount(): Result<Unit> {

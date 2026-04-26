@@ -40,15 +40,19 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermission()
 
         var startDestination by mutableStateOf<String?>(null)
-        var isDarkMode by mutableStateOf(true)
+        var currentTheme by mutableStateOf(com.jikanhub.app.presentation.theme.AppTheme.DARK)
 
         lifecycleScope.launch {
             launch {
                 startDestination = if (authRepository.isLoggedIn()) "dashboard" else "login"
             }
             launch {
-                tokenManager.isDarkMode.collectLatest { dark ->
-                    isDarkMode = dark
+                tokenManager.appTheme.collectLatest { themeString ->
+                    currentTheme = try {
+                        com.jikanhub.app.presentation.theme.AppTheme.valueOf(themeString)
+                    } catch (e: Exception) {
+                        com.jikanhub.app.presentation.theme.AppTheme.DARK
+                    }
                 }
             }
         }
@@ -56,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         splashScreen.setKeepOnScreenCondition { startDestination == null }
 
         setContent {
-            JikanHubTheme(darkTheme = isDarkMode) {
+            JikanHubTheme(theme = currentTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     startDestination?.let { destination ->
                         JikanNavHost(startDestination = destination)

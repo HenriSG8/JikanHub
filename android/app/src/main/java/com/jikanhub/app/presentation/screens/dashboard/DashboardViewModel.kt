@@ -83,8 +83,9 @@ class DashboardViewModel @Inject constructor(
 
     fun toggleTheme() {
         viewModelScope.launch {
-            val newTheme = !_uiState.value.isDarkMode
-            tokenManager.setDarkMode(newTheme)
+            val currentTheme = _uiState.value.appTheme
+            val newTheme = if (currentTheme == "DARK") "LIGHT" else "DARK"
+            tokenManager.setAppTheme(newTheme)
         }
     }
 
@@ -92,6 +93,12 @@ class DashboardViewModel @Inject constructor(
         _uiState.update { it.copy(currentTab = tab) }
         if (tab == DashboardTab.TASKS_OF_DAY) {
             selectDate(LocalDate.now())
+        }
+    }
+
+    fun unlockEasterEgg() {
+        viewModelScope.launch {
+            tokenManager.unlockEasterEgg()
         }
     }
 
@@ -105,8 +112,8 @@ class DashboardViewModel @Inject constructor(
 
     private fun loadThemePreference() {
         viewModelScope.launch {
-            tokenManager.isDarkMode.collect { isDark ->
-                _uiState.update { it.copy(isDarkMode = isDark) }
+            tokenManager.appTheme.collect { theme ->
+                _uiState.update { it.copy(appTheme = theme) }
             }
         }
     }

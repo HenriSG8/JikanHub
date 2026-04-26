@@ -51,7 +51,7 @@ fun TaskCard(
         colors = CardDefaults.cardColors(
             containerColor = JikanSurfaceVariant.copy(alpha = cardAlpha)
         ),
-        border = if (LocalIsDarkTheme.current) null else BorderStroke(
+        border = if (LocalAppTheme.current != AppTheme.LIGHT) null else BorderStroke(
             width = 1.dp,
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
         ),

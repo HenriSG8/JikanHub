@@ -24,6 +24,10 @@ class TokenManager @Inject constructor(
     private val NOTIFICATION_SOUND_KEY = stringPreferencesKey("notification_sound_uri")
     private val TUTORIAL_COMPLETED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("tutorial_completed")
     private val LAST_SYNC_TIME_KEY = stringPreferencesKey("last_sync_time")
+    
+    // Easter Egg & Themes
+    private val EASTER_EGG_UNLOCKED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("easter_egg_unlocked")
+    private val APP_THEME_KEY = stringPreferencesKey("app_theme")
 
     val lastSyncTime: Flow<String?> = context.dataStore.data
         .map { preferences ->
@@ -33,6 +37,17 @@ class TokenManager @Inject constructor(
     suspend fun setLastSyncTime(time: String) {
         context.dataStore.edit { preferences ->
             preferences[LAST_SYNC_TIME_KEY] = time
+        }
+    }
+
+    val isEasterEggUnlocked: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[EASTER_EGG_UNLOCKED_KEY] ?: false
+        }
+
+    suspend fun unlockEasterEgg() {
+        context.dataStore.edit { preferences ->
+            preferences[EASTER_EGG_UNLOCKED_KEY] = true
         }
     }
 
@@ -68,14 +83,14 @@ class TokenManager @Inject constructor(
             preferences[NAME_KEY] ?: "Usuário"
         }
 
-    val isDarkMode: Flow<Boolean> = context.dataStore.data
+    val appTheme: Flow<String> = context.dataStore.data
         .map { preferences ->
-            preferences[DARK_MODE_KEY] ?: true // Default is dark theme
+            preferences[APP_THEME_KEY] ?: "DARK" // Default is DARK
         }
 
-    suspend fun setDarkMode(isDark: Boolean) {
+    suspend fun setAppTheme(theme: String) {
         context.dataStore.edit { preferences ->
-            preferences[DARK_MODE_KEY] = isDark
+            preferences[APP_THEME_KEY] = theme
         }
     }
 
