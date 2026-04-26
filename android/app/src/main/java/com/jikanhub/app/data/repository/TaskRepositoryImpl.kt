@@ -9,6 +9,7 @@ import com.jikanhub.app.domain.model.Task
 import com.jikanhub.app.domain.model.TaskStatus
 import com.jikanhub.app.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.LocalTime
@@ -22,6 +23,8 @@ import javax.inject.Inject
  */
 class TaskRepositoryImpl @Inject constructor(
     private val taskDao: TaskDao,
+    private val api: com.jikanhub.app.data.remote.api.JikanHubApi,
+    private val tokenManager: com.jikanhub.app.data.local.TokenManager,
     private val workManager: WorkManager
 ) : TaskRepository {
 
@@ -97,5 +100,25 @@ class TaskRepositoryImpl @Inject constructor(
             ExistingWorkPolicy.REPLACE,
             syncRequest
         )
+    }
+
+    override suspend fun clearAllTasks() {
+        taskDao.deleteAll()
+    }
+
+    override suspend fun fetchEverything() {
+        try {
+            // Use POST /api/sync with empty tasks list.
+            // The backend always returns ALL user tasks in the POST sync response.
+            val request = com.jikanhub.app.data.remote.dto.SyncRequest(tasks = emptyList())
+            val response = api.pushSync(request)
+            
+            val entities = response.tasks.map { it.toEntity() }
+            if (entities.isNotEmpty()) {
+                taskDao.insertAll(entities)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.jikanhub.app.auth
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.jikanhub.app.BuildConfig
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
@@ -17,7 +18,7 @@ class GoogleAuthManager(private val context: Context) {
         try {
             val googleIdOption = GetGoogleIdOption.Builder()
                 .setFilterByAuthorizedAccounts(false)
-                .setServerClientId("557952229165-j0m4bob9cqjfd45ugnb4brm6ofqdc2f9.apps.googleusercontent.com")
+                .setServerClientId(BuildConfig.GOOGLE_CLIENT_ID)
                 .setAutoSelectEnabled(true)
                 .build()
 
@@ -35,13 +36,14 @@ class GoogleAuthManager(private val context: Context) {
 
             val credential = result.credential
             if (credential is GoogleIdTokenCredential) {
-                Log.d(TAG, "Token obtido com sucesso!")
+                // Token obtido com sucesso
                 return credential.idToken
             }
             Log.w(TAG, "Tipo de credencial inesperado: ${credential.type}")
             null
         } catch (e: GetCredentialException) {
             Log.e(TAG, "Erro do CredentialManager: ${e.message}", e)
+
         } catch (e: Exception) {
             Log.e(TAG, "Erro inesperado no login com Google: ${e.message}", e)
         }

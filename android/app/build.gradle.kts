@@ -20,7 +20,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "BASE_URL", "\"http://185.225.233.145:8080\"")
+        buildConfigField("String", "BASE_URL", "\"https://runamd.duckdns.org\"") // You must update this with the real prod URL
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"557952229165-j0m4bob9cqjfd45ugnb4brm6ofqdc2f9.apps.googleusercontent.com\"")
     }
 
     buildTypes {
@@ -31,7 +32,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"http://185.225.233.145:8080\"")
+            buildConfigField("String", "BASE_URL", "\"https://runamd.duckdns.org\"") // Update for prod
+            buildConfigField("String", "GOOGLE_CLIENT_ID", "\"557952229165-j0m4bob9cqjfd45ugnb4brm6ofqdc2f9.apps.googleusercontent.com\"")
         }
     }
 

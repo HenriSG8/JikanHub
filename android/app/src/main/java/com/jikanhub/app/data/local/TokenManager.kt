@@ -22,6 +22,30 @@ class TokenManager @Inject constructor(
     private val NAME_KEY = stringPreferencesKey("user_name")
     private val DARK_MODE_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("dark_mode")
     private val NOTIFICATION_SOUND_KEY = stringPreferencesKey("notification_sound_uri")
+    private val TUTORIAL_COMPLETED_KEY = androidx.datastore.preferences.core.booleanPreferencesKey("tutorial_completed")
+    private val LAST_SYNC_TIME_KEY = stringPreferencesKey("last_sync_time")
+
+    val lastSyncTime: Flow<String?> = context.dataStore.data
+        .map { preferences ->
+            preferences[LAST_SYNC_TIME_KEY]
+        }
+
+    suspend fun setLastSyncTime(time: String) {
+        context.dataStore.edit { preferences ->
+            preferences[LAST_SYNC_TIME_KEY] = time
+        }
+    }
+
+    val isTutorialCompleted: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[TUTORIAL_COMPLETED_KEY] ?: false
+        }
+
+    suspend fun setTutorialCompleted(completed: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[TUTORIAL_COMPLETED_KEY] = completed
+        }
+    }
 
     val notificationSoundUri: Flow<String?> = context.dataStore.data
         .map { preferences ->
@@ -66,6 +90,8 @@ class TokenManager @Inject constructor(
         context.dataStore.edit { preferences ->
             preferences.remove(TOKEN_KEY)
             preferences.remove(NAME_KEY)
+            preferences.remove(TUTORIAL_COMPLETED_KEY)
+            preferences.remove(LAST_SYNC_TIME_KEY)
         }
     }
 }

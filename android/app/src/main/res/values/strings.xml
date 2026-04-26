@@ -67,4 +67,26 @@
     <string name="auth_password">Password</string>
     <string name="auth_name">Name</string>
     <string name="auth_google">Sign in with Google</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial_welcome_title">Welcome to JikanHub!</string>
+    <string name="tutorial_welcome_desc">Let\'s show you how to organize your time proactively.</string>
+    <string name="tutorial_tasks_title">Your Routine</string>
+    <string name="tutorial_tasks_desc">Your daily tasks will appear here. You can mark them as completed with a tap.</string>
+    <string name="tutorial_tasks_pointer">See your tasks here</string>
+    <string name="tutorial_add_task_title">Create Task</string>
+    <string name="tutorial_add_task_desc">Tap the \'+\' button to add a new task or habit.</string>
+    <string name="tutorial_add_task_pointer">Create new tasks</string>
+    <string name="tutorial_menu_title">Navigation</string>
+    <string name="tutorial_menu_desc">Use the side menu to see your calendar and statistics.</string>
+    <string name="tutorial_menu_pointer">Access the menu</string>
+    <string name="tutorial_theme_title">Customization</string>
+    <string name="tutorial_theme_desc">Toggle between light and dark themes as you prefer.</string>
+    <string name="tutorial_theme_pointer">Change the look</string>
+    <string name="tutorial_skip">Exit Tutorial</string>
+    <string name="tutorial_next">Next</string>
+    <string name="tutorial_finish">Get Started</string>
+    <string name="settings_sync_manual">Manual Sync</string>
+    <string name="settings_sync_now">Sync Now</string>
+    <string name="settings_sync_running">Syncing...</string>
 </resources>

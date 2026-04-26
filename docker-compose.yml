@@ -7,11 +7,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DATABASE_URL: jdbc:postgresql://185.225.233.145:5432/jikanhub_db
-      DATABASE_USER: jikan_admin
-      DATABASE_PASSWORD: jikanhub
-      JWT_SECRET: "${JWT_SECRET:-jikanhub_secret_key_2026_safe}"
-      JWT_ISSUER: "http://185.225.233.145:8080"
-      JWT_AUDIENCE: "jikanhub-users"
+      DATABASE_URL: "${DATABASE_URL}"
+      DATABASE_USER: "${DATABASE_USER}"
+      DATABASE_PASSWORD: "${DATABASE_PASSWORD}"
+      JWT_SECRET: "${JWT_SECRET}"
+      JWT_ISSUER: "${JWT_ISSUER}"
+      JWT_AUDIENCE: "${JWT_AUDIENCE}"
       GROQ_API_KEY: "${GROQ_API_KEY}"
     restart: always

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JikanHub</string>
+
+    <!-- Greetings -->
+    <string name="greeting_morning">Bom dia</string>
+    <string name="greeting_afternoon">Boa tarde</string>
+    <string name="greeting_evening">Boa noite</string>
+    <string name="greeting_user">Olá, %1$s</string>
+
+    <!-- Dashboard -->
+    <string name="empty_tasks">Nenhuma tarefa para este dia</string>
+    <string name="fab_new_task">Nova Tarefa</string>
+    <string name="drawer_tasks_day">Tarefas do Dia</string>
+    <string name="drawer_calendar">Calendário</string>
+    <string name="drawer_settings">Configurações</string>
+    <string name="drawer_logout">Sair</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial_welcome_title">Bem-vindo ao JikanHub!</string>
+    <string name="tutorial_welcome_desc">Vamos te mostrar como organizar seu tempo de forma proativa.</string>
+    <string name="tutorial_tasks_title">Sua Rotina</string>
+    <string name="tutorial_tasks_desc">Aqui aparecerão suas tarefas do dia. Você pode marcá-las como concluídas com um toque.</string>
+    <string name="tutorial_tasks_pointer">Veja suas tarefas aqui</string>
+    <string name="tutorial_add_task_title">Criar Tarefa</string>
+    <string name="tutorial_add_task_desc">Toque no botão \'+\' para adicionar uma nova tarefa ou hábito.</string>
+    <string name="tutorial_add_task_pointer">Crie novas tarefas</string>
+    <string name="tutorial_menu_title">Navegação</string>
+    <string name="tutorial_menu_desc">Use o menu lateral para ver seu calendário e estatísticas.</string>
+    <string name="tutorial_menu_pointer">Acesse o menu</string>
+    <string name="tutorial_theme_title">Personalização</string>
+    <string name="tutorial_theme_desc">Alterne entre o tema claro e escuro conforme sua preferência.</string>
+    <string name="tutorial_theme_pointer">Mude o visual</string>
+    <string name="tutorial_skip">Sair do Tutorial</string>
+    <string name="tutorial_next">Próximo</string>
+    <string name="tutorial_finish">Começar</string>
+    <string name="settings_sync_manual">Sincronização Manual</string>
+    <string name="settings_sync_now">Sincronizar Agora</string>
+    <string name="settings_sync_running">Sincronizando...</string>
+</resources>

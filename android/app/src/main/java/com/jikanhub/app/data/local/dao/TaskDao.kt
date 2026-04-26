@@ -58,4 +58,7 @@ interface TaskDao {
 
     @Query("DELETE FROM tasks WHERE isDeleted = 1 AND isSynced = 1")
     suspend fun cleanupSyncedDeleted()
+
+    @Query("DELETE FROM tasks")
+    suspend fun deleteAll()
 }

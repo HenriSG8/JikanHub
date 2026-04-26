@@ -10,7 +10,7 @@ import io.ktor.server.response.*
 import java.util.*
 
 object JwtConfig {
-    val secret: String = System.getenv("JWT_SECRET") ?: "jikanhub-dev-secret-change-in-production"
+    val secret: String = System.getenv("JWT_SECRET") ?: throw IllegalStateException("JWT_SECRET environment variable is not set")
     val issuer: String = System.getenv("JWT_ISSUER") ?: "jikanhub-api"
     val audience: String = System.getenv("JWT_AUDIENCE") ?: "jikanhub-app"
     private val algorithm = Algorithm.HMAC256(secret)

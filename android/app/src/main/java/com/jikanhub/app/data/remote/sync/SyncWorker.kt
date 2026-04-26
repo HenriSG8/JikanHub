@@ -12,6 +12,7 @@ import com.jikanhub.app.data.remote.dto.SyncRequest
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 
 @HiltWorker
@@ -19,28 +20,44 @@ class SyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val api: JikanHubApi,
-    private val taskDao: TaskDao
+    private val taskDao: TaskDao,
+    private val tokenManager: com.jikanhub.app.data.local.TokenManager
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            // 1. Get unsynced tasks from local DB
+            // 1. Get last sync time
+            val lastSync = tokenManager.lastSyncTime.first()
+            
+            // 2. Get unsynced tasks from local DB
             val unsyncedTasks = taskDao.getUnsyncedTasks()
             
-            // 2. Push to server
-            val syncRequest = SyncRequest(tasks = unsyncedTasks.map { it.toDto() })
-            val response = api.pushSync(syncRequest)
+            // 3. Push to server
+            val pushRequest = SyncRequest(tasks = unsyncedTasks.map { it.toDto() })
+            val pushResponse = api.pushSync(pushRequest)
             
-            // 3. Mark pushed tasks as synced
+            // 4. Mark pushed tasks as synced
             if (unsyncedTasks.isNotEmpty()) {
                 taskDao.markAsSynced(unsyncedTasks.map { it.id })
             }
             
-            // 4. Save server tasks to local DB (Pull/Sync)
-            val serverEntities = response.tasks.map { it.toEntity() }
-            taskDao.insertAll(serverEntities)
+            // 5. Pull from server (to get everything else)
+            val lastSyncStr = lastSync ?: "1970-01-01T00:00:00Z"
+            val pullResponse = api.pullSync(since = lastSyncStr)
             
-            // 5. Cleanup (optional: could delete local tasks that were soft-deleted on server)
+            // 6. Save all server tasks to local DB
+            val serverEntities = (pushResponse.tasks + pullResponse.tasks)
+                .distinctBy { it.id }
+                .map { it.toEntity() }
+            
+            if (serverEntities.isNotEmpty()) {
+                taskDao.insertAll(serverEntities)
+            }
+            
+            // 7. Save server timestamp for next sync
+            tokenManager.setLastSyncTime(pullResponse.serverTimestamp)
+            
+            // 8. Cleanup
             taskDao.cleanupSyncedDeleted()
             
             Result.success()

@@ -277,6 +277,14 @@ fun DashboardScreen(
             onTaskCreated = { viewModel.onTaskCreated() }
         )
     }
+
+    if (uiState.showTutorial) {
+        TutorialOverlay(
+            step = uiState.tutorialStep,
+            onNext = { viewModel.nextTutorialStep() },
+            onSkip = { viewModel.skipTutorial() }
+        )
+    }
 }
 
 @Composable

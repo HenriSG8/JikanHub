@@ -6,6 +6,7 @@ import com.jikanhub.app.data.remote.dto.AuthRequest
 import com.jikanhub.app.data.remote.dto.AuthResponse
 import com.jikanhub.app.data.remote.dto.GoogleAuthRequest
 import com.jikanhub.app.domain.repository.AuthRepository
+import com.jikanhub.app.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,7 +14,8 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val api: JikanHubApi,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val taskRepository: TaskRepository
 ) : AuthRepository {
 
     override suspend fun login(request: AuthRequest): Result<AuthResponse> {
@@ -47,6 +49,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
+        taskRepository.clearAllTasks()
         tokenManager.clearAuthData()
     }
 

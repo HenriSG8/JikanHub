@@ -19,4 +19,6 @@ interface TaskRepository {
     suspend fun updateTaskStatus(id: String, status: TaskStatus)
     suspend fun deleteTask(id: String)
     suspend fun syncWithServer()
+    suspend fun clearAllTasks()
+    suspend fun fetchEverything()
 }

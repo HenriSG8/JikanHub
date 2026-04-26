@@ -25,6 +25,10 @@ class LoginViewModel @Inject constructor(
             _uiState.update { it.copy(error = "Preencha todos os campos") }
             return
         }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _uiState.update { it.copy(error = "E-mail inválido") }
+            return
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }

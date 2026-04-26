@@ -24,6 +24,18 @@ class RegisterViewModel @Inject constructor(
             _uiState.update { it.copy(error = "Preencha todos os campos") }
             return
         }
+        if (name.trim().length < 2) {
+            _uiState.update { it.copy(error = "Nome muito curto") }
+            return
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _uiState.update { it.copy(error = "E-mail inválido") }
+            return
+        }
+        if (password.length < 8 || !password.any { it.isDigit() }) {
+            _uiState.update { it.copy(error = "A senha deve ter pelo menos 8 caracteres e 1 número") }
+            return
+        }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }

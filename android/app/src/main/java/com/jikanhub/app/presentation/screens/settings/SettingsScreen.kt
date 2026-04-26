@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -107,6 +108,19 @@ fun SettingsScreen(
                 )
 
                 SoundPickerItem(
+                    viewModel = hiltViewModel()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.settings_sync_manual),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JikanOnSurface,
+                    fontWeight = FontWeight.Bold
+                )
+
+                ManualSyncItem(
                     viewModel = hiltViewModel()
                 )
             }
@@ -219,6 +233,64 @@ private fun LanguageItem(
             }
             if (selected) {
                 RadioButton(selected = true, onClick = null)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ManualSyncItem(
+    viewModel: SettingsViewModel
+) {
+    val isSyncing by viewModel.isSyncing.collectAsState()
+
+    Surface(
+        onClick = { if (!isSyncing) viewModel.manualSync() },
+        color = JikanSurface,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth(),
+        border = androidx.compose.foundation.BorderStroke(1.dp, JikanOnSurface.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Sync,
+                    contentDescription = null,
+                    tint = if (isSyncing) MaterialTheme.colorScheme.primary else JikanOnSurface
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = stringResource(R.string.settings_sync_now),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = JikanOnSurface
+                    )
+                    if (isSyncing) {
+                        Text(
+                            text = stringResource(R.string.settings_sync_running),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+            if (isSyncing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = null,
+                    tint = JikanOnSurfaceVariant
+                )
             }
         }
     }

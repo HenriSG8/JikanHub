@@ -21,6 +21,8 @@ class DashboardViewModel @Inject constructor(
     private val updateTaskStatus: UpdateTaskStatusUseCase,
     private val deleteTask: com.jikanhub.app.domain.usecase.DeleteTaskUseCase,
     private val updateTask: com.jikanhub.app.domain.usecase.UpdateTaskUseCase,
+    private val clearAllTasks: com.jikanhub.app.domain.usecase.ClearAllTasksUseCase,
+    private val syncTasks: com.jikanhub.app.domain.usecase.SyncTasksUseCase,
     private val alarmScheduler: com.jikanhub.app.notification.AlarmScheduler,
     private val tokenManager: com.jikanhub.app.data.local.TokenManager,
     private val application: android.app.Application
@@ -50,41 +52,31 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    fun testNotification() {
-        viewModelScope.launch {
-            val testTask = com.jikanhub.app.domain.model.Task(
-                id = "test_id",
-                title = "Teste de Notificação",
-                description = "Lembrete proativo funcionando!",
-                dateTime = java.time.LocalDateTime.now().plusSeconds(10),
-                priority = com.jikanhub.app.domain.model.Priority.HIGH,
-                reminder = com.jikanhub.app.domain.model.ReminderConfig(
-                    enabled = true,
-                    message = "Lembrete JikanHub",
-                    offsets = listOf(com.jikanhub.app.domain.model.ReminderOffset.AT_TIME)
-                )
-            )
-            
-            // Dispara o alarme diretamente para o teste
-            alarmScheduler.schedule(
-                taskId = testTask.id,
-                triggerAtMillis = System.currentTimeMillis() + 5000, // 5 segundos
-                title = testTask.title,
-                message = testTask.reminder.message,
-                offsetMinutes = 0
-            )
-        }
-    }
-
+    // testNotification removed
     init {
-        selectDate(LocalDate.now())
         updateGreeting()
         loadUserName()
         loadThemePreference()
+        checkTutorialStatus()
+        triggerInitialSync()
+    }
+
+    private fun triggerInitialSync() {
+        viewModelScope.launch {
+            // Wait for token to be available
+            tokenManager.token.first { it != null }
+            
+            _uiState.update { it.copy(isLoading = true) }
+            syncTasks(forceForeground = true)
+            
+            // After sync, reload tasks from Room for the selected date
+            selectDate(_uiState.value.selectedDate)
+        }
     }
 
     fun logout() {
         viewModelScope.launch {
+            clearAllTasks()
             tokenManager.clearAuthData()
         }
     }
@@ -214,5 +206,35 @@ class DashboardViewModel @Inject constructor(
             else -> "greeting_evening"
         }
         _uiState.update { it.copy(greeting = greeting) }
+    }
+
+    private fun checkTutorialStatus() {
+        viewModelScope.launch {
+            tokenManager.isTutorialCompleted.collect { completed ->
+                if (!completed) {
+                    _uiState.update { it.copy(showTutorial = true) }
+                }
+            }
+        }
+    }
+
+    fun nextTutorialStep() {
+        val currentStep = _uiState.value.tutorialStep
+        if (currentStep < TutorialStep.entries.size - 1) {
+            _uiState.update { it.copy(tutorialStep = currentStep + 1) }
+        } else {
+            finishTutorial()
+        }
+    }
+
+    fun skipTutorial() {
+        finishTutorial()
+    }
+
+    private fun finishTutorial() {
+        viewModelScope.launch {
+            tokenManager.setTutorialCompleted(true)
+            _uiState.update { it.copy(showTutorial = false) }
+        }
     }
 }
