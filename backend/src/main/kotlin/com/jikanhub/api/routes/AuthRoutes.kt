@@ -98,7 +98,7 @@ fun Route.authRoutes() {
             try {
                 val client = io.ktor.client.HttpClient(io.ktor.client.engine.cio.CIO) {
                     install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-                        io.ktor.serialization.kotlinx.json.json()
+                        json()
                     }
                 }
 
